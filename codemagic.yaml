@@ -1,34 +1,13 @@
 workflows:
   android-debug:
     name: Android Debug Build
+
     environment:
       flutter: stable
 
     scripts:
-      - name: Flutter Version
-        script: flutter --version
+      - flutter pub get
+      - flutter build apk --debug
 
-      - name: Regenerate Gradle Wrapper
-        script: |
-          cd android
-          if command -v gradle >/dev/null 2>&1; then
-            gradle wrapper --gradle-version 8.11.1 --distribution-type all
-          else
-            mkdir -p gradle/wrapper
-            curl -sSL -o gradle/wrapper/gradle-wrapper.jar \
-              https://raw.githubusercontent.com/gradle/gradle/v8.11.1/gradle/wrapper/gradle-wrapper.jar
-          fi
-          chmod +x gradlew
-          cd ..
-
-      - name: Pub Get
-        script: flutter pub get
-
-      - name: Diagnose V1 Embedding
-        script: |
-          flutter pub deps
-          echo "========== PUB CACHE =========="
-          find $HOME/.pub-cache -type f \( -name "*.java" -o -name "*.kt" -o -name "pubspec.yaml" \) | xargs grep -HnE "PluginRegistry\.Registrar|registerWith|io\.flutter\.app|FlutterApplication"
-
-      - name: Build Android
-        script: flutter build appbundle --debug --verbose
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
