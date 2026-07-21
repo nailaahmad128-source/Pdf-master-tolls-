@@ -1,0 +1,108 @@
+name: pdf_master_tools
+description: "PDF Master Tools — PDF, scanning, OCR, QR, and conversion toolkit."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Typography
+  google_fonts: ^6.2.1
+
+  # Icons
+  lucide_icons: ^0.257.0
+
+  # Motion / premium micro-interactions
+  animations: ^2.0.11
+
+  # SVG placeholder illustrations for onboarding
+  flutter_svg: ^2.0.10+1
+
+  # Shimmer loading states
+  shimmer: ^3.0.0
+
+  # --- Functional layer (added) ---
+
+  # Lightweight state management for settings/library providers
+  provider: ^6.1.2
+
+  # Local persistence: settings, favorites, recent files, history
+  shared_preferences: ^2.2.3
+
+  # Filesystem paths (app documents / cache dirs)
+  path_provider: ^2.1.3
+  path: ^1.9.0
+
+  # Runtime permission handling (camera/storage/photos/notifications)
+  permission_handler: ^11.3.1
+
+  # Native share sheet for files/text
+  share_plus: ^9.0.0
+
+  # File & image selection
+  file_picker: ^8.0.6
+  image_picker: ^1.1.2
+
+  # PDF creation (image -> pdf) and rasterization/printing
+  pdf: ^3.11.1
+  printing: ^5.13.1
+
+  # PDF document manipulation: merge, split, encrypt/decrypt
+  syncfusion_flutter_pdf: ^26.2.14
+  syncfusion_flutter_core: ^26.2.14
+
+  # Raster image processing (compression, rotation, crop helpers)
+  image: ^4.2.0
+  flutter_image_compress: ^2.3.0
+  image_cropper: ^8.0.2
+
+  # Camera-based document scanning with edge detection & multi-page capture
+
+  # Signature capture for Fill & Sign
+  signature: ^5.5.0
+
+  # OCR (Latin / English) via on-device ML Kit -- fast, accurate, and
+  # fully offline for English/Spanish/French, but has NO Arabic-script
+  # model (see ocr_service.dart).
+  google_mlkit_text_recognition: ^0.13.1
+
+  # OCR (Arabic / Urdu) via bundled Tesseract -- the only offline engine
+  # here with real ara.traineddata / urd.traineddata language support.
+  # Ships as a native Android library; trained-data files are downloaded
+  # once per language and cached under app documents (see
+  # lib/services/ocr_service.dart for the download + cache flow).
+
+  # AdMob: banner / interstitial / rewarded / native ads
+  google_mobile_ads: ^5.1.0
+
+  # Background isolate scheduling for OCR/scan batches so the UI thread
+  # never janks during multi-page processing.
+  flutter_isolate: ^2.0.4
+
+  # QR scan + generate
+  mobile_scanner: ^5.2.3
+  qr_flutter: ^4.1.0
+
+  # Currency live rates
+  http: ^1.2.2
+
+  # Formatting dates/numbers across history & file lists
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # assets/ (placeholders — drop real illustrations/icons in before shipping)
+  assets:
+    - assets/illustrations/
+    - assets/icons/
