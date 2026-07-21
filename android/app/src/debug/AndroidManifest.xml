@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Explicit in debug for clarity even though it's already declared in
+         the main manifest -- needed for the Flutter debug/profile
+         observatory connection and hot-reload. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

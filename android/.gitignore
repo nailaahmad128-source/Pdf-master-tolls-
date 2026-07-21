@@ -1,0 +1,12 @@
+/.gradle
+/captures/
+GeneratedPluginRegistrant.java
+.cxx/
+
+key.properties
+*.jks
+*.keystore
+local.properties
+
+*.iml
+.idea/

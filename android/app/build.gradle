@@ -1,0 +1,129 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0.0"
+}
+
+// Release signing config is read from android/key.properties (git-ignored).
+// See android/key.properties.example for the template. Falls back to the
+// debug keystore automatically if key.properties is absent, so `flutter
+// run --release` still works before you generate a real upload key --
+// DO NOT ship a Play Store build signed with the debug key.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+def hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.pdfmastertools.app"
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    defaultConfig {
+        // Play Store application id -- change ONLY before first publish,
+        // it cannot be changed after the app is live.
+        applicationId "com.pdfmastertools.app"
+        minSdkVersion 23
+        targetSdkVersion 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+
+        // Room for future dynamic feature / locale splitting; also required
+        // by some ML Kit language pack downloads.
+        resConfigs "en", "ur", "ar"
+    }
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            release {
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+                storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
+                storePassword keystoreProperties["storePassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            // Debug AdMob test app id (from AndroidManifest meta-data) is
+            // always used in this build type via lib/services/ads_service.dart.
+        }
+        release {
+            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+        profile {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    lint {
+        checkReleaseBuilds false
+        disable "InvalidPackage"
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+
+    // Multidex support (large dependency tree: Syncfusion PDF, ML Kit,
+    // AdMob, CameraX-based doc scanner all push past the 64K method limit
+    // on minSdk < 21 devices and are safest with it enabled globally).
+    implementation "androidx.multidex:multidex:2.0.1"
+
+    // On-device ML Kit Latin-script recognizer used by
+    // google_mlkit_text_recognition for ENGLISH OCR only. IMPORTANT:
+    // ML Kit's on-device text recognizer supports Latin, Chinese,
+    // Devanagari, Japanese, and Korean scripts -- it has no Arabic-script
+    // model, so it cannot be used for Arabic or Urdu. Those two languages
+    // are handled by the bundled Tesseract engine instead (see
+    // lib/services/ocr_service.dart and android/app/src/main/assets/tessdata).
+    implementation "com.google.mlkit:text-recognition:16.0.1"
+}
