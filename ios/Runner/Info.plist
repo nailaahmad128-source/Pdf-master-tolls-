@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>PDF Master Tools</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>pdf_master_tools</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+
+	<!-- Camera: document scanning + QR scanning (flutter_doc_scanner,
+	     mobile_scanner, image_picker camera source). -->
+	<key>NSCameraUsageDescription</key>
+	<string>PDF Master Tools uses the camera to scan documents and read QR codes.</string>
+
+	<!-- Photo library: importing images to convert/compress or attach to
+	     PDFs (image_picker, image_cropper). -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PDF Master Tools needs access to your photo library to import images for PDF creation, conversion, and editing.</string>
+
+	<!-- Saving processed/scanned images and exported files back to Photos. -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>PDF Master Tools saves scanned pages and converted images to your photo library.</string>
+
+	<!-- Microphone entry included as a safe default for camera-adjacent
+	     plugins that request AVCaptureDevice authorization; unused by the
+	     app's own features. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PDF Master Tools does not use the microphone. This permission is not required for normal use.</string>
+
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+
+	<!-- AdMob (google_mobile_ads) application id. This is Google's shared
+	     TEST app id for iOS -- safe to ship in debug and safe as a
+	     placeholder, but MUST be replaced with your real iOS AdMob app id
+	     from admob.google.com before a production App Store release, to
+	     match the swap already noted for Android in
+	     lib/services/ads_service.dart. -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+
+	<!-- Required by google_mobile_ads on iOS 14+ so the SDK can request
+	     App Tracking Transparency-adjacent ad identifiers correctly. -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
+
+	<!-- Package visibility for opening/sharing PDFs and images with other
+	     installed apps (share_plus / file_picker "open in" flows). -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>itms-apps</string>
+	</array>
+
+	<!-- Document types: lets the app appear in "Open with" / "Share" for
+	     PDFs, mirroring the Android VIEW/SEND intent filters. -->
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF Document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array/>
+</dict>
+</plist>

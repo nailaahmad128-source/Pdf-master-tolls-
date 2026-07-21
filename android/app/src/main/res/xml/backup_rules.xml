@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude large generated/cached user documents from Android Auto
+         Backup so backups stay fast and under the 25MB quota; app
+         settings (shared_preferences) are still backed up. -->
+    <exclude domain="file" path="documents/" />
+    <exclude domain="file" path="scans/" />
+    <exclude domain="file" path="ocr_exports/" />
+    <exclude domain="cache" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>
