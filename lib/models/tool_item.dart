@@ -29,19 +29,6 @@ class ToolCatalog {
 
   static const List<ToolItem> all = [
     ToolItem(
-      title: 'Document Scanner',
-      subtitle: 'Scan crisp, cropped pages',
-      icon: Icons.document_scanner_rounded,
-      category: ToolCategory.scan,
-    ),
-    ToolItem(
-      title: 'Smart ID Scanner',
-      subtitle: 'Auto-detect ID cards',
-      icon: Icons.badge_rounded,
-      category: ToolCategory.scan,
-      isNew: true,
-    ),
-    ToolItem(
       title: 'OCR — Image to Text',
       subtitle: 'Extract text instantly',
       icon: Icons.text_snippet_rounded,
