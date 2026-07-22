@@ -71,33 +71,6 @@ class HomeScreen extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
               sliver: SliverToBoxAdapter(
-                child: SectionHeader(
-                  title: 'Favorite Tools',
-                  actionLabel: 'See all',
-                  onActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PdfToolsScreen())),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 165,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: favorites.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (_, i) => SizedBox(
-                      width: 150,
-                      child: ToolCard(item: favorites[i], onTap: () => openTool(context, favorites[i])),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
-              sliver: SliverToBoxAdapter(
                 child: SectionHeader(title: 'Categories', actionLabel: null, onActionTap: null),
               ),
             ),
