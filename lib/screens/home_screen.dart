@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               sliver: SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 132,
+                  height: 165,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: favorites.length,
