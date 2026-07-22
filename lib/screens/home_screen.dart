@@ -58,10 +58,6 @@ class HomeScreen extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              sliver: SliverToBoxAdapter(child: AppSearchBar(onFilterTap: () {})),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               sliver: SliverToBoxAdapter(child: const _WelcomeBanner()),
             ),
             SliverPadding(
