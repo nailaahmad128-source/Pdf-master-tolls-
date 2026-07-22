@@ -238,7 +238,6 @@ class _OcrScreenState extends State<OcrScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Wrap(
-                    alignment: WrapAlignment.center,
                     children: [
                       Text(_language.label, style: AppTextStyles.label(theme.colorScheme.onSurface)),
                       const SizedBox(width: 4),
@@ -391,7 +390,6 @@ class _OcrScreenState extends State<OcrScreen> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(
         child: Column(
-          alignment: WrapAlignment.center,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
