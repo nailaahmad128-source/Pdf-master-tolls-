@@ -45,6 +45,13 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
       AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat(reverse: true);
 
   @override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _scan();
+  });
+}
+
   void dispose() {
     _scanController.dispose();
     super.dispose();
