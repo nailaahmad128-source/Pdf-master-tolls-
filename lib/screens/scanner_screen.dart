@@ -4,6 +4,7 @@ import 'dart:ui' show PointMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
@@ -47,13 +48,24 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
   @override
 void initState() {
   super.initState();
+  _initCamera();
   WidgetsBinding.instance.addPostFrameCallback((_) {
     _scan();
   });
 }
 
-  void dispose() {
-    _scanController.dispose();
+  Future<void> _initCamera() async {
+  _cameras = await availableCameras();
+  if (_cameras.isEmpty) return;
+  _cameraController = CameraController(_cameras.first, ResolutionPreset.high);
+  await _cameraController!.initialize();
+  if (!mounted) return;
+  setState(() => _cameraReady = true);
+}
+
+void dispose() {
+    _cameraController?.dispose();
+  _scanController.dispose();
     super.dispose();
   }
 
@@ -93,6 +105,10 @@ void initState() {
 
   final ImagePicker _picker = ImagePicker();
 
+CameraController? _cameraController;
+List<CameraDescription> _cameras = [];
+bool _cameraReady = false;
+
   Future<void> _scan() async {
     final outcome = await PermissionService.camera();
     if (outcome != PermissionOutcome.granted) {
@@ -103,12 +119,10 @@ void initState() {
 
     setState(() => _scanning = true);
     try {
-      final shot = await _picker.pickImage(source: ImageSource.camera, imageQuality: 100);
-      if (shot == null) {
-        if (!mounted) return;
-        setState(() => _scanning = false);
-        return;
+      if (_cameraController == null || !_cameraController!.value.isInitialized) {
+        throw Exception("Camera not initialized");
       }
+      final shot = await _cameraController!.takePicture();
       if (!await File(shot.path).exists()) {
         if (!mounted) return;
         setState(() => _scanning = false);
@@ -262,9 +276,9 @@ void initState() {
                     colors: [Color(0xFF1A1A22), Color(0xFF101014)],
                   ),
                 ),
-                child: Center(
-                  child: Icon(Icons.image_outlined, size: 64, color: Colors.white.withOpacity(0.15)),
-                ),
+                child: (_cameraReady && _cameraController != null)
+                  ? CameraPreview(_cameraController!)
+                  : const Center(child: CircularProgressIndicator()),
               ),
             ),
             Center(
@@ -341,7 +355,14 @@ void initState() {
                     icon: _flashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
                     background: Colors.white.withOpacity(0.12),
                     iconColor: Colors.white,
-                    onPressed: () => setState(() => _flashOn = !_flashOn),
+                    onPressed: () async {
+                      if (_cameraController == null) return;
+                      final newFlash = !_flashOn;
+                      await _cameraController!.setFlashMode(newFlash ? FlashMode.torch : FlashMode.off);
+                      if (mounted) {
+                        setState(() => _flashOn = newFlash);
+                      }
+                    },
                   ),
                 ],
               ),
