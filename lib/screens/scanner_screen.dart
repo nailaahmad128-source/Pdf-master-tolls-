@@ -48,7 +48,14 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
   @override
 void initState() {
   super.initState();
-  _initCamera();
+  _startScanner();
+}
+
+Future<void> _startScanner() async {
+  await _initCamera();
+
+  if (!mounted) return;
+
   WidgetsBinding.instance.addPostFrameCallback((_) {
     _scan();
   });
@@ -59,6 +66,11 @@ void initState() {
   if (_cameras.isEmpty) return;
   _cameraController = CameraController(_cameras.first, ResolutionPreset.high);
   await _cameraController!.initialize();
+
+  _minZoom = await _cameraController!.getMinZoomLevel();
+  _maxZoom = await _cameraController!.getMaxZoomLevel();
+  _currentZoom = _minZoom;
+
   if (!mounted) return;
   setState(() => _cameraReady = true);
 }
@@ -108,6 +120,10 @@ void dispose() {
 CameraController? _cameraController;
 List<CameraDescription> _cameras = [];
 bool _cameraReady = false;
+
+double _currentZoom = 1.0;
+double _minZoom = 1.0;
+double _maxZoom = 1.0;
 
   Future<void> _scan() async {
     final outcome = await PermissionService.camera();
