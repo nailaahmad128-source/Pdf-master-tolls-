@@ -258,6 +258,21 @@ bool _cameraReady = false;
     );
   }
 
+
+  Future<void> _focusOnTap(TapDownDetails details, BoxConstraints constraints) async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+
+    final position = details.localPosition;
+
+    final dx = position.dx / constraints.maxWidth;
+    final dy = position.dy / constraints.maxHeight;
+
+    try {
+      await _cameraController!.setFocusPoint(Offset(dx, dy));
+      await _cameraController!.setExposurePoint(Offset(dx, dy));
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     final scanQuality = context.watch<SettingsProvider>().defaultScanQuality;
@@ -277,7 +292,14 @@ bool _cameraReady = false;
                   ),
                 ),
                 child: (_cameraReady && _cameraController != null)
-                  ? CameraPreview(_cameraController!)
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return GestureDetector(
+                          onTapDown: (details) => _focusOnTap(details, constraints),
+                          child: CameraPreview(_cameraController!),
+                        );
+                      },
+                    )
                   : const Center(child: CircularProgressIndicator()),
               ),
             ),
