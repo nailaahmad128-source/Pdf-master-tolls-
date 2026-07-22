@@ -237,7 +237,7 @@ class _OcrScreenState extends State<OcrScreen> {
                     color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
+                  child: Wrap(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(_language.label, style: AppTextStyles.label(theme.colorScheme.onSurface)),
@@ -290,7 +290,7 @@ class _OcrScreenState extends State<OcrScreen> {
               _LanguagePackBanner(language: _language, progress: _downloadProgress!),
             ],
             const SizedBox(height: 20),
-            Row(
+            Wrap(
               children: [
                 Icon(Icons.text_snippet_rounded, size: 18, color: AppColors.scanPrimary),
                 const SizedBox(width: 8),
@@ -320,7 +320,7 @@ class _OcrScreenState extends State<OcrScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            Row(
+            Wrap(
               children: [
                 Expanded(
                   child: SecondaryButton(label: 'Copy', icon: Icons.copy_rounded, onPressed: _copyText),
@@ -332,7 +332,7 @@ class _OcrScreenState extends State<OcrScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
+            Wrap(
               children: [
                 Expanded(
                   child: SecondaryButton(label: 'Save as TXT', icon: Icons.description_rounded, onPressed: _exportAsTxt),
@@ -344,7 +344,7 @@ class _OcrScreenState extends State<OcrScreen> {
               ],
             ),
             const SizedBox(height: 32),
-            Row(
+            Wrap(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Recent OCR', style: AppTextStyles.title(theme.colorScheme.onSurface)),
@@ -433,7 +433,7 @@ class _LanguagePackBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Wrap(
             children: [
               const Icon(Icons.download_rounded, size: 18, color: AppColors.scanPrimary),
               const SizedBox(width: 8),
@@ -479,7 +479,7 @@ class _PageStrip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Wrap(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${paths.length} page${paths.length == 1 ? '' : 's'}', style: AppTextStyles.subtitle(theme.colorScheme.onSurface)),
@@ -569,7 +569,7 @@ class _RecentOcrTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
-            child: Row(
+            child: Wrap(
               children: [
                 Container(
                   width: 42,
