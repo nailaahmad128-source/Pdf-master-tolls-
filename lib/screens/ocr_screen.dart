@@ -238,7 +238,7 @@ class _OcrScreenState extends State<OcrScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Wrap(
-                    mainAxisSize: MainAxisSize.min,
+                    alignment: WrapAlignment.center,
                     children: [
                       Text(_language.label, style: AppTextStyles.label(theme.colorScheme.onSurface)),
                       const SizedBox(width: 4),
@@ -345,7 +345,7 @@ class _OcrScreenState extends State<OcrScreen> {
             ),
             const SizedBox(height: 32),
             Wrap(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              alignment: WrapAlignment.spaceBetween,
               children: [
                 Text('Recent OCR', style: AppTextStyles.title(theme.colorScheme.onSurface)),
                 if (_history.isNotEmpty)
@@ -391,7 +391,7 @@ class _OcrScreenState extends State<OcrScreen> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          alignment: WrapAlignment.center,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
@@ -480,7 +480,7 @@ class _PageStrip extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          alignment: WrapAlignment.spaceBetween,
           children: [
             Text('${paths.length} page${paths.length == 1 ? '' : 's'}', style: AppTextStyles.subtitle(theme.colorScheme.onSurface)),
             TextButton(onPressed: onClearAll, child: const Text('Clear all')),
