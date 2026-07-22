@@ -53,10 +53,6 @@ class HomeScreen extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-              sliver: SliverToBoxAdapter(child: const HomeAppBar()),
-            ),
-            SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               sliver: SliverToBoxAdapter(child: const _WelcomeBanner()),
             ),
