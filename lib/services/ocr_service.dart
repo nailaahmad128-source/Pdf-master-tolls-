@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -98,6 +99,7 @@ class OcrException implements Exception {
 ///   ([isLanguageReady]/[ensureLanguageReady]) is left in place since it
 ///   is engine-agnostic and ready to drive a future replacement engine.
 class OcrService {
+  static const String _visionApi = "https://pdf-master-tools-vision-api-x19h.vercel.app/api/ocr";
   OcrService._();
 
   static const _tessdataBaseUrl =
@@ -195,13 +197,30 @@ class OcrService {
     }
 
     if (language.tesseractCode != null) {
-      try {
-        return await _recognizeWithTesseract(imagePath, language);
-      } catch (e) {
+      final bytes = await File(imagePath).readAsBytes();
+      final base64Image = base64Encode(bytes);
+      final response = await http.post(
+        Uri.parse(_visionApi),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "image": base64Image,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw OcrException("OCR server error: ${response.statusCode}");
+      }
+
+      final data = jsonDecode(response.body);
+      if (data["success"] != true) {
         throw OcrException(
-          'Could not read ${language.label} text: $e',
+          data["message"] ?? "OCR failed.",
         );
       }
+
+      return data["text"] ?? "";
     }
 
     throw OcrException(
