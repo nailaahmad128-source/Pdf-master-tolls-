@@ -127,56 +127,12 @@ class _ImageToolsScreenState extends State<ImageToolsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Image Tools', style: AppTextStyles.headline(theme.colorScheme.onSurface))),
+      appBar: AppBar(title: Text('Image to PDF', style: AppTextStyles.headline(theme.colorScheme.onSurface))),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
           children: [
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _tools.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.85,
-              ),
-              itemBuilder: (context, i) {
-                final (label, icon) = _tools[i];
-                return Material(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(18),
-                    onTap: i == 0 ? _addImages : () => _comingSoon(label),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: theme.colorScheme.outlineVariant),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 42,
-                            height: 42,
-                            decoration:
-                                BoxDecoration(color: AppColors.pdfSoft, borderRadius: BorderRadius.circular(12)),
-                            child: Icon(icon, color: AppColors.pdfPrimary, size: 20),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(label,
-                              textAlign: TextAlign.center, style: AppTextStyles.bodySmall(theme.colorScheme.onSurface)),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 28),
+            
             Row(
               children: [
                 Expanded(
