@@ -1,8 +1,7 @@
 {
-  "language": "eng",
-  "languages": [
-    "eng",
-    "urd",
-    "ara"
+  "files": [
+    "eng.traineddata",
+    "urd.traineddata",
+    "ara.traineddata"
   ]
 }
