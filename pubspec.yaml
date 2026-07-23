@@ -108,4 +108,5 @@ flutter:
   assets:
     - assets/illustrations/
     - assets/tessdata/
+    - assets/tessdata_config.json
     - assets/icons/
