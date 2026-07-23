@@ -23,13 +23,7 @@ class ImageToolsScreen extends StatefulWidget {
 
 class _ImageToolsScreenState extends State<ImageToolsScreen> {
   static const _tools = [
-    ('Image to PDF', Icons.picture_as_pdf_rounded),
-    ('Resize Image', Icons.aspect_ratio_rounded),
-    ('Compress Image', Icons.compress_rounded),
-    ('Crop & Rotate', Icons.crop_rotate_rounded),
-    ('Convert Format', Icons.autorenew_rounded),
-    ('Watermark', Icons.branding_watermark_rounded),
-  ];
+    ('Image to PDF', Icons.picture_as_pdf_rounded),  ];
 
   final List<String> _imagePaths = [];
   String _pageSize = 'A4';
