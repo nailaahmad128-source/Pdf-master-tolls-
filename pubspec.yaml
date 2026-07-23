@@ -71,6 +71,7 @@ dependencies:
   # fully offline for English/Spanish/French, but has NO Arabic-script
   # model (see ocr_service.dart).
   google_mlkit_text_recognition: ^0.13.1
+  flutter_tesseract_ocr: ^0.4.31
 
   # OCR (Arabic / Urdu) via bundled Tesseract -- the only offline engine
   # here with real ara.traineddata / urd.traineddata language support.
@@ -106,4 +107,5 @@ flutter:
   # assets/ (placeholders — drop real illustrations/icons in before shipping)
   assets:
     - assets/illustrations/
+    - assets/tessdata/
     - assets/icons/

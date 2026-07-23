@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -13,21 +14,50 @@ import 'package:printing/printing.dart';
 /// actually supports its script. This is the single source of truth the
 /// UI reads from -- no language is listed here unless there's a real,
 /// tested recognizer behind it.
-enum OcrLanguage { english, spanish, french, arabic, urdu }
+enum OcrLanguage {
+  english,
+  spanish,
+  french,
+  german,
+  italian,
+  portuguese,
+  dutch,
+  turkish,
+  indonesian,
+  vietnamese,
+  arabic,
+  urdu,
+}
 
 extension OcrLanguageX on OcrLanguage {
   String get label => switch (this) {
-        OcrLanguage.english => 'English',
-        OcrLanguage.spanish => 'Spanish',
-        OcrLanguage.french => 'French',
-        OcrLanguage.arabic => 'Arabic',
-        OcrLanguage.urdu => 'Urdu',
+        OcrLanguage.english => '🇺🇸 English',
+        OcrLanguage.spanish => '🇪🇸 Spanish',
+        OcrLanguage.french => '🇫🇷 French',
+        OcrLanguage.german => '🇩🇪 German',
+        OcrLanguage.italian => '🇮🇹 Italian',
+        OcrLanguage.portuguese => '🇵🇹 Portuguese',
+        OcrLanguage.dutch => '🇳🇱 Dutch',
+        OcrLanguage.turkish => '🇹🇷 Turkish',
+        OcrLanguage.indonesian => '🇮🇩 Indonesian',
+        OcrLanguage.vietnamese => '🇻🇳 Vietnamese',
+        OcrLanguage.arabic => '🇸🇦 Arabic',
+        OcrLanguage.urdu => '🇵🇰 Urdu',
       };
 
   /// Whether this language is read by the on-device Google ML Kit Latin
   /// recognizer (fast, bundled with the app, no download).
   bool get usesMlKit =>
-      this == OcrLanguage.english || this == OcrLanguage.spanish || this == OcrLanguage.french;
+      this == OcrLanguage.english ||
+      this == OcrLanguage.spanish ||
+      this == OcrLanguage.french ||
+      this == OcrLanguage.german ||
+      this == OcrLanguage.italian ||
+      this == OcrLanguage.portuguese ||
+      this == OcrLanguage.dutch ||
+      this == OcrLanguage.turkish ||
+      this == OcrLanguage.indonesian ||
+      this == OcrLanguage.vietnamese;
 
   /// Tesseract language code (ISO 639-2) for the trained-data file, for
   /// the Arabic-script languages ML Kit cannot read.
@@ -134,6 +164,22 @@ class OcrService {
     await File('$destPath.part').rename(destPath);
   }
 
+
+  static Future<String> _recognizeWithTesseract(
+    String imagePath,
+    OcrLanguage language,
+  ) async {
+    final code = language.tesseractCode!;
+    return await FlutterTesseractOcr.extractText(
+      imagePath,
+      language: code,
+      args: {
+        "psm": "3",
+        "oem": "1",
+      },
+    );
+  }
+
   /// OCRs a single image and returns the recognized text for [language].
   static Future<String> recognizeImage(String imagePath, OcrLanguage language) async {
     if (language.usesMlKit) {
@@ -148,13 +194,18 @@ class OcrService {
       }
     }
 
-    // Arabic/Urdu were previously recognized via flutter_tesseract_ocr,
-    // which has been removed from this project. There is currently no
-    // replacement OCR engine wired up for these two languages, so fail
-    // clearly rather than silently returning empty text.
+    if (language.tesseractCode != null) {
+      try {
+        return await _recognizeWithTesseract(imagePath, language);
+      } catch (e) {
+        throw OcrException(
+          'Could not read ${language.label} text: $e',
+        );
+      }
+    }
+
     throw OcrException(
-      '${language.label} OCR is temporarily unavailable in this build. '
-      'English, Spanish, and French OCR still work normally.',
+      'Unsupported OCR language: ${language.label}',
     );
   }
 
