@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'open_source_licenses_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/list_tiles.dart';
