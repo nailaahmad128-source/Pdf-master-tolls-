@@ -57,10 +57,6 @@ class HomeScreen extends StatelessWidget {
               sliver: SliverToBoxAdapter(child: const _WelcomeBanner()),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-              sliver: 
-            ),
-            SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
               sliver: SliverToBoxAdapter(
                 child: SectionHeader(title: 'Categories', actionLabel: null, onActionTap: null),

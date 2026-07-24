@@ -67,16 +67,6 @@ class PdfMasterToolsApp extends StatelessWidget {
 
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en'),
-              Locale('ur'),
-              Locale('ar'),
-            ],
             home: const SplashScreen(),
           );
         },
