@@ -73,11 +73,11 @@ class HomeScreen extends StatelessWidget {
                   height: 118,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: ToolCategory.values.length,
+                    itemCount: ToolCategory.values.where((e) => e != ToolCategory.scan).length,
                     separatorBuilder: (_, __) => const SizedBox(width: 12),
                     itemBuilder: (_, i) => _CategoryChip(
-                      category: ToolCategory.values[i],
-                      onTap: () => _openCategory(context, ToolCategory.values[i]),
+                      category: ToolCategory.values.where((e) => e != ToolCategory.scan).toList()[i],
+                      onTap: () => _openCategory(context, ToolCategory.values.where((e) => e != ToolCategory.scan).toList()[i]),
                     ),
                   ),
                 ),
@@ -183,10 +183,10 @@ class _WelcomeBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Scan → PDF in one tap', style: AppTextStyles.title(Colors.white)),
+                Text('All PDF Tools in One Place', style: AppTextStyles.title(Colors.white)),
                 const SizedBox(height: 6),
                 Text(
-                  'Auto edge detection & HD output',
+                  'Merge • Split • Compress • Convert',
                   style: AppTextStyles.bodySmall(Colors.white.withOpacity(0.85)),
                 ),
               ],
@@ -209,17 +209,13 @@ class _QuickActionsRow extends StatelessWidget {
   const _QuickActionsRow();
 
   static const _actions = [
-    ('Scan', Icons.document_scanner_rounded, AppColors.scanPrimary, AppColors.scanSoft),
     ('Merge', Icons.merge_type_rounded, AppColors.pdfPrimary, AppColors.pdfSoft),
-    ('OCR', Icons.text_snippet_rounded, AppColors.qrPrimary, AppColors.qrSoft),
     ('Convert', Icons.autorenew_rounded, AppColors.convertPrimary, AppColors.convertSoft),
   ];
 
   void _onTap(BuildContext context, String label) {
     Widget screen = switch (label) {
-      'Scan' => const ScannerScreen(),
       'Merge' => const MergePdfScreen(),
-      'OCR' => const OcrScreen(),
       'Convert' => const ConverterScreen(),
       _ => const ScannerScreen(),
     };

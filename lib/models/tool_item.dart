@@ -29,11 +29,6 @@ class ToolCatalog {
 
   static const List<ToolItem> all = [
     ToolItem(
-      title: 'OCR — Image to Text',
-      subtitle: 'Extract text instantly',
-      icon: Icons.text_snippet_rounded,
-      category: ToolCategory.scan,
-    ),
     ToolItem(
       title: 'Image to PDF',
       subtitle: 'Combine photos into PDF',

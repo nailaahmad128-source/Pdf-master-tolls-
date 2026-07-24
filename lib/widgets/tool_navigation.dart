@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/tool_item.dart';
 import '../screens/converter_screen.dart';
 import '../screens/image_tools_screen.dart';
-import '../screens/ocr_screen.dart';
 import '../screens/pdf_tools/compress_pdf_screen.dart';
 import '../screens/pdf_tools/fill_sign_screen.dart';
 import '../screens/pdf_tools/lock_unlock_pdf_screen.dart';
@@ -20,9 +19,6 @@ void openTool(BuildContext context, ToolItem item) {
     case 'Document Scanner':
     case 'Smart ID Scanner':
       screen = const ScannerScreen();
-      break;
-    case 'OCR — Image to Text':
-      screen = const OcrScreen();
       break;
     case 'Image to PDF':
       screen = const ImageToolsScreen();
