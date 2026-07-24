@@ -37,8 +37,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             Text(
-              'PDF Master Tools is a premium document utility for scanning, editing, converting and securing your '
-              'PDFs — designed to be fast, clean and useful everywhere, for everyone.',
+              'PDF Master Tools is an all-in-one PDF solution that helps you scan, edit, merge, split, compress, convert and organize PDF documents with speed, simplicity and privacy.',
               style: AppTextStyles.bodyLarge(theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
@@ -52,10 +51,6 @@ class AboutScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  SettingsTile(icon: Icons.mail_outline_rounded, title: 'Contact support', onTap: () {}),
-                  Divider(height: 1, color: theme.colorScheme.outlineVariant),
-                  SettingsTile(icon: Icons.description_outlined, title: 'Terms of Service', onTap: () {}),
-                  Divider(height: 1, color: theme.colorScheme.outlineVariant),
                   SettingsTile(
                     icon: Icons.code_rounded,
                     title: 'Open-source licenses',
@@ -71,6 +66,12 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Text('© 2026 PDF Master Tools. All rights reserved.',
                 textAlign: TextAlign.center, style: AppTextStyles.caption(theme.colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 8),
+            Text(
+              'Built with ❤️ in Pakistan',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodySmall(theme.colorScheme.onSurfaceVariant),
+            ),
           ],
         ),
       ),

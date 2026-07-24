@@ -29,7 +29,6 @@ class ToolCatalog {
 
   static const List<ToolItem> all = [
     ToolItem(
-    ToolItem(
       title: 'Image to PDF',
       subtitle: 'Combine photos into PDF',
       icon: Icons.image_rounded,
