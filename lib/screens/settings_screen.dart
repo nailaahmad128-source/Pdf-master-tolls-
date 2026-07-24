@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:local_auth/local_auth.dart';
 import '../providers/library_provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/file_service.dart';
@@ -18,6 +19,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final LocalAuthentication _localAuth = LocalAuthentication();
   String _cacheSize = 'Calculating…';
 
   @override
@@ -62,6 +64,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _loadCacheSize();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cache cleared.')));
+  }
+
+
+  Future<void> _toggleBiometric(bool enable) async {
+    final settings = context.read<SettingsProvider>();
+
+    if (!enable) {
+      await settings.setBiometricLock(false);
+      return;
+    }
+
+    try {
+      final supported = await _localAuth.isDeviceSupported();
+      final canCheck = await _localAuth.canCheckBiometrics;
+
+      if (!supported || !canCheck) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Biometric authentication is not available on this device.'),
+          ),
+        );
+        return;
+      }
+
+      final authenticated = await _localAuth.authenticate(
+        localizedReason: 'Authenticate to enable app lock',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      await settings.setBiometricLock(authenticated);
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Biometric authentication failed.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -155,7 +200,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Biometric app lock',
                   trailing: Switch(
                     value: settings.biometricLock,
-                    onChanged: (v) => settings.setBiometricLock(v),
+                    onChanged: _toggleBiometric,
                   ),
                 ),
                 SettingsTile(
@@ -242,6 +287,9 @@ class _SettingsGroup extends StatelessWidget {
   final String title;
   final List<Widget> children;
   const _SettingsGroup({required this.title, required this.children});
+
+
+  
 
   @override
   Widget build(BuildContext context) {
