@@ -206,6 +206,7 @@ class OcrService {
         },
         body: jsonEncode({
           "image": base64Image,
+          "language": language.tesseractCode ?? "eng",
         }),
       );
 
