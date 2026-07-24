@@ -18,13 +18,11 @@ class SettingsProvider extends ChangeNotifier {
   bool _biometricLock = false;
   bool _autoBackup = true;
   String _defaultScanQuality = 'HD';
-  String _appLanguage = 'English';
 
   ThemeMode get themeMode => _themeMode;
   bool get biometricLock => _biometricLock;
   bool get autoBackup => _autoBackup;
   String get defaultScanQuality => _defaultScanQuality;
-  String get appLanguage => _appLanguage;
 
   void _load() {
     final storedTheme = LocalStore.instance.getString(StoreKeys.themeMode);
@@ -36,7 +34,6 @@ class SettingsProvider extends ChangeNotifier {
     _biometricLock = LocalStore.instance.getBool(StoreKeys.biometricLock);
     _autoBackup = LocalStore.instance.getBool(StoreKeys.autoBackup, defaultValue: true);
     _defaultScanQuality = LocalStore.instance.getString(StoreKeys.defaultScanQuality) ?? 'HD';
-    _appLanguage = LocalStore.instance.getString(StoreKeys.appLanguage) ?? 'English';
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
@@ -67,11 +64,5 @@ class SettingsProvider extends ChangeNotifier {
     _defaultScanQuality = value;
     notifyListeners();
     await LocalStore.instance.setString(StoreKeys.defaultScanQuality, value);
-  }
-
-  Future<void> setAppLanguage(String value) async {
-    _appLanguage = value;
-    notifyListeners();
-    await LocalStore.instance.setString(StoreKeys.appLanguage, value);
   }
 }

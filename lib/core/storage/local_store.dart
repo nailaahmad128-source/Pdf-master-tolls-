@@ -103,7 +103,6 @@ class StoreKeys {
   static const biometricLock = 'settings.biometricLock';
   static const autoBackup = 'settings.autoBackup';
   static const defaultScanQuality = 'settings.defaultScanQuality';
-  static const appLanguage = 'settings.appLanguage';
   static const onboardingComplete = 'settings.onboardingComplete';
 
   static const recentFiles = 'library.recentFiles';

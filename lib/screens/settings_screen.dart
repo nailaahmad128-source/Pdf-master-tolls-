@@ -99,7 +99,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
       await settings.setBiometricLock(authenticated);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Biometric Error: $e');
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -161,17 +162,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   trailing: Switch(
                     value: settings.isDarkModeOn,
                     onChanged: (v) => settings.setDarkModeOn(v),
-                  ),
-                ),
-                SettingsTile(
-                  icon: Icons.language_rounded,
-                  title: 'App language',
-                  subtitle: settings.appLanguage,
-                  onTap: () => _showChoiceSheet(
-                    title: 'App language',
-                    options: const ['English', 'Urdu', 'Arabic'],
-                    current: settings.appLanguage,
-                    onSelected: settings.setAppLanguage,
                   ),
                 ),
                 SettingsTile(

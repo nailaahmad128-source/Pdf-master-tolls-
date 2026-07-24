@@ -61,10 +61,22 @@ class PdfMasterToolsApp extends StatelessWidget {
         builder: (context, settings, _) {
           return MaterialApp(
             title: 'PDF Master Tools',
+
             debugShowCheckedModeBanner: false,
             themeMode: settings.themeMode,
+
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('ur'),
+              Locale('ar'),
+            ],
             home: const SplashScreen(),
           );
         },
