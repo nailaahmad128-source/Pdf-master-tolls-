@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:local_auth/local_auth.dart';
 import '../providers/library_provider.dart';
 import '../providers/settings_provider.dart';
@@ -139,15 +140,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Alex Morgan', style: AppTextStyles.title(Colors.white)),
-                        Text('Free plan · 3 of 5 tools/day', style: AppTextStyles.bodySmall(Colors.white.withOpacity(0.85))),
+                        Text('PDF Master Tools', style: AppTextStyles.title(Colors.white)),
+                        Text('Fast • Secure • Offline PDF Toolkit', style: AppTextStyles.bodySmall(Colors.white.withOpacity(0.85))),
                       ],
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-                    child: Text('Upgrade', style: AppTextStyles.label(AppColors.brandIndigo)),
                   ),
                 ],
               ),
@@ -234,8 +230,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () =>
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen())),
                 ),
-                SettingsTile(icon: Icons.star_border_rounded, title: 'Rate the app', onTap: () {}),
-                SettingsTile(icon: Icons.share_outlined, title: 'Share with friends', onTap: () {}),
+                SettingsTile(
+                  icon: Icons.star_border_rounded,
+                  title: 'Rate the app',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Coming soon on Google Play'),
+                      ),
+                    );
+                  },
+                ),
+                SettingsTile(
+                  icon: Icons.share_outlined,
+                  title: 'Share with friends',
+                  onTap: () {
+                    Share.share(
+                      'Try PDF Master Tools!\n\nFast • Secure • Offline PDF Toolkit\n\nComing soon on Google Play.',
+                    );
+                  },
+                ),
               ],
             ),
           ],
