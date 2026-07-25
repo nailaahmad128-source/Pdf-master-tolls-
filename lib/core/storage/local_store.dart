@@ -107,6 +107,7 @@ class StoreKeys {
 
   static const recentFiles = 'library.recentFiles';
   static const favoriteFiles = 'library.favoriteFiles';
+  static const trashFiles = 'library.trashFiles';
 
   static const ocrHistory = 'history.ocr';
   static const qrHistory = 'history.qr';

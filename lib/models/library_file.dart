@@ -22,6 +22,7 @@ class LibraryFile {
   final int sizeBytes;
   final DateTime modifiedAt;
   final LibraryFileType type;
+  final String? originalPath;
 
   const LibraryFile({
     required this.id,
@@ -30,6 +31,7 @@ class LibraryFile {
     required this.sizeBytes,
     required this.modifiedAt,
     required this.type,
+    this.originalPath,
   });
 
   factory LibraryFile.fromPath(String path, {DateTime? modifiedAt, int? sizeBytes}) {
@@ -51,6 +53,7 @@ class LibraryFile {
         'sizeBytes': sizeBytes,
         'modifiedAt': modifiedAt.toIso8601String(),
         'type': type.name,
+        'originalPath': originalPath,
       };
 
   factory LibraryFile.fromJson(Map<String, dynamic> json) => LibraryFile(
@@ -59,6 +62,7 @@ class LibraryFile {
         name: json['name'] as String,
         sizeBytes: json['sizeBytes'] as int? ?? 0,
         modifiedAt: DateTime.tryParse(json['modifiedAt'] as String? ?? '') ?? DateTime.now(),
+        originalPath: json['originalPath'] as String?,
         type: LibraryFileType.values.firstWhere(
           (t) => t.name == json['type'],
           orElse: () => LibraryFileType.pdf,
@@ -72,6 +76,7 @@ class LibraryFile {
         sizeBytes: sizeBytes ?? this.sizeBytes,
         modifiedAt: modifiedAt ?? this.modifiedAt,
         type: type,
+        originalPath: originalPath,
       );
 
   String get readableSize {

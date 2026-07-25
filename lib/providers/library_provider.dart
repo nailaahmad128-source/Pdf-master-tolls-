@@ -109,8 +109,7 @@ class LibraryProvider extends ChangeNotifier {
   }
 
   Future<void> deleteFile(String path) async {
-    final file = File(path);
-    if (await file.exists()) await file.delete();
+    await FileService.delete(path);
     await LocalStore.instance.removeFromBucket(StoreKeys.recentFiles, path);
     await LocalStore.instance.removeFromBucket(StoreKeys.favoriteFiles, path);
     _load();

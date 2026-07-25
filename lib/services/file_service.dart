@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../core/storage/local_store.dart';
 import '../models/library_file.dart';
 
 enum FileSortOrder { nameAsc, nameDesc, dateNewest, dateOldest, sizeLargest, sizeSmallest }
@@ -21,6 +22,17 @@ class FileService {
     final docs = await getApplicationDocumentsDirectory();
     final dir = Directory(p.join(docs.path, 'PDFMasterTools'));
     if (!await dir.exists()) await dir.create(recursive: true);
+    return dir;
+  }
+
+
+  static Future<Directory> trashDirectory() async {
+    final dir = Directory(
+      p.join((await workingDirectory()).path, '.trash'),
+    );
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
     return dir;
   }
 
@@ -121,9 +133,100 @@ class FileService {
     return renamed.path;
   }
 
-  static Future<void> delete(String path) async {
+
+  static Future<void> moveToTrash(String path) async {
     final file = File(path);
-    if (await file.exists()) await file.delete();
+    if (!await file.exists()) return;
+
+    final trash = await trashDirectory();
+    final name = p.basename(path);
+    final target = p.join(trash.path, name);
+
+    await file.rename(target);
+
+    await LocalStore.instance.pushToBucket(
+      StoreKeys.trashFiles,
+      {
+        'id': target,
+        'path': target,
+        'originalPath': path,
+        'deletedAt': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+
+  static Future<List<LibraryFile>> listTrashFiles() async {
+    final trash = await trashDirectory();
+    final entities = await trash.list().toList();
+
+    final files = <LibraryFile>[];
+
+    for (final entity in entities) {
+      if (entity is! File) continue;
+
+      final stat = await entity.stat();
+
+      final meta = LocalStore.instance
+          .readBucket(StoreKeys.trashFiles)
+          .cast<Map<String, dynamic>>()
+          .where((e) => e['path'] == entity.path)
+          .cast<Map<String, dynamic>>()
+          .toList();
+
+      files.add(
+        LibraryFile(
+          id: entity.path,
+          path: entity.path,
+          name: p.basename(entity.path),
+          sizeBytes: stat.size,
+          modifiedAt: stat.modified,
+          type: libraryFileTypeFromExtension(entity.path),
+          originalPath: meta.isEmpty ? null : meta.first['originalPath'] as String?,
+        ),
+      );
+    }
+
+    return files;
+  }
+
+
+  static Future<void> restoreFromTrash(
+    String trashPath,
+    String originalPath,
+  ) async {
+    final file = File(trashPath);
+    if (!await file.exists()) return;
+
+    final target = File(originalPath);
+    if (!await target.parent.exists()) {
+      await target.parent.create(recursive: true);
+    }
+
+    await file.rename(originalPath);
+
+    await LocalStore.instance.removeFromBucket(
+      StoreKeys.trashFiles,
+      trashPath,
+    );
+  }
+
+
+  static Future<void> deleteForever(String trashPath) async {
+    final file = File(trashPath);
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    await LocalStore.instance.removeFromBucket(
+      StoreKeys.trashFiles,
+      trashPath,
+    );
+  }
+
+  static Future<void> delete(String path) async {
+    await moveToTrash(path);
   }
 
   static String readableSize(int bytes) {

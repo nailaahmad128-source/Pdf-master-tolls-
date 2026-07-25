@@ -27,6 +27,7 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   FileSortOrder _sort = FileSortOrder.dateNewest;
 
   List<LibraryFile> _allFiles = [];
+  List<LibraryFile> _trashFiles = [];
   bool _loading = true;
   ({int usedBytes, int fileCount})? _storage;
 
@@ -39,10 +40,12 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   Future<void> _load() async {
     setState(() => _loading = true);
     final files = await FileService.listAll();
+    final trash = await FileService.listTrashFiles();
     final storage = await FileService.storageSummary();
     if (!mounted) return;
     setState(() {
       _allFiles = files;
+      _trashFiles = trash;
       _storage = storage;
       _loading = false;
     });
@@ -131,11 +134,12 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
                             relativeDate: _relativeDate,
                             onMore: (f) => _showFileActions(context, f),
                           ),
-                          const EmptyStateView(
-                            icon: Icons.delete_outline_rounded,
-                            title: 'No recently deleted files',
-                            message:
-                                'Deleted files are removed from your device right away in this version — a 30-day recycle bin is planned for an upcoming update.',
+                          _FileGridOrList(
+                            files: _trashFiles,
+                            gridView: _gridView,
+                            isFavorite: library.isFavorite,
+                            relativeDate: _relativeDate,
+                            onMore: (f) => _showTrashActions(context, f),
                           ),
                         ],
                       ),
@@ -299,6 +303,39 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
       ),
     );
   }
+
+  
+void _showTrashActions(BuildContext context, LibraryFile file) {
+  AppBottomSheet.show(
+    context,
+    title: file.name,
+    children: [
+      SheetAction(
+        icon: Icons.restore_rounded,
+        label: 'Restore',
+        onTap: () async {
+          Navigator.pop(context);
+          if (file.originalPath != null) {
+            await FileService.restoreFromTrash(
+              file.path,
+              file.originalPath!,
+            );
+            await _load();
+          }
+        },
+      ),
+      SheetAction(
+        icon: Icons.delete_forever_rounded,
+        label: 'Delete Forever',
+        color: AppColors.error,
+        onTap: () async {
+          Navigator.pop(context);
+          await FileService.deleteForever(file.path);
+          await _load();
+        },
+      ),
+    ],
+  );
 }
 
 class _FileGridOrList extends StatelessWidget {
