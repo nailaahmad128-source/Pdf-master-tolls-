@@ -3,7 +3,6 @@ import '../models/tool_item.dart';
 import '../screens/converter_screen.dart';
 import '../screens/image_tools_screen.dart';
 import '../screens/pdf_tools/compress_pdf_screen.dart';
-import '../screens/pdf_tools/fill_sign_screen.dart';
 import '../screens/pdf_tools/lock_unlock_pdf_screen.dart';
 import '../screens/pdf_tools/merge_pdf_screen.dart';
 import '../screens/pdf_tools/pdf_to_image_screen.dart';
@@ -36,8 +35,6 @@ void openTool(BuildContext context, ToolItem item) {
       screen = const PdfToImageScreen();
       break;
     case 'Fill & Sign':
-      screen = const FillSignScreen();
-      break;
     case '__REMOVED__':
       screen = const LockUnlockPdfScreen();
       break;
