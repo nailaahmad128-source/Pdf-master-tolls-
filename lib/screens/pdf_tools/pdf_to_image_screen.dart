@@ -58,32 +58,18 @@ class _PdfToImageScreenState extends State<PdfToImageScreen> {
       }
       if (!mounted) return;
       setState(() => _exporting = false);
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: '${pages.length} image${pages.length == 1 ? '' : 's'} exported',
-          message: 'Pages are saved to your image library and Recent Files.',
-          confirmLabel: 'Share all',
-          cancelLabel: 'Done',
-          onConfirm: () async {
-            for (final page in pages) {
-              await FileService.shareFile(page.path);
-            }
-          },
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-    } on PdfOperationException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ Images saved successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+for (final page in pages) {
+  await FileService.shareFile(page.path);
+}
+
+} on PdfOperationException catch (e) {
       setState(() => _exporting = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));

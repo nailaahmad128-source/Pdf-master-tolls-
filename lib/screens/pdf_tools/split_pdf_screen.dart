@@ -94,32 +94,18 @@ class _SplitPdfScreenState extends State<SplitPdfScreen> {
       }
       if (!mounted) return;
       setState(() => _splitting = false);
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: '${outputs.length} file${outputs.length == 1 ? '' : 's'} created',
-          message: 'Your split PDF pages are saved to Recent PDFs.',
-          confirmLabel: 'Share all',
-          cancelLabel: 'Done',
-          onConfirm: () async {
-            for (final out in outputs) {
-              await FileService.shareFile(out);
-            }
-          },
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-    } on PdfOperationException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ Split PDFs saved successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+for (final out in outputs) {
+  await FileService.shareFile(out);
+}
+
+} on PdfOperationException catch (e) {
       setState(() => _splitting = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));

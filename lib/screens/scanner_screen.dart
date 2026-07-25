@@ -182,9 +182,9 @@ double _maxZoom = 1.0;
           icon: Icons.check_circle_rounded,
           iconColor: AppColors.scanPrimary,
           title: 'Scan saved as PDF',
-          message: 'Your scanned document is ready to share or save.',
+          message: 'Your scanned document has been saved successfully.',
           confirmLabel: 'Share',
-          cancelLabel: 'Done',
+          cancelLabel: 'Close',
           onConfirm: () => FileService.shareFile(outputPath),
         ),
       );

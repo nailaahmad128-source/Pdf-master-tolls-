@@ -57,30 +57,16 @@ class _CompressPdfScreenState extends State<CompressPdfScreen> {
       final savedPct = _originalSize == null || _originalSize == 0
           ? 0
           : (100 - (newSize / _originalSize! * 100)).clamp(0, 99).round();
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: 'PDF compressed',
-          message: savedPct > 0
-              ? '${FileService.readableSize(newSize)} (down $savedPct% from ${FileService.readableSize(_originalSize!)})'
-              : 'Compressed file saved as ${FileService.readableSize(newSize)}.',
-          confirmLabel: 'Share',
-          cancelLabel: 'Done',
-          onConfirm: () => FileService.shareFile(outputPath),
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-    } on PdfOperationException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ PDF compressed successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+await FileService.shareFile(outputPath);
+
+} on PdfOperationException catch (e) {
       setState(() => _compressing = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));

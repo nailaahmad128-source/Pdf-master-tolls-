@@ -76,30 +76,16 @@ class _LockUnlockPdfScreenState extends State<LockUnlockPdfScreen> {
         _passwordController.clear();
         _confirmController.clear();
       });
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: _mode == _Mode.lock ? 'PDF protected' : 'PDF unlocked',
-          message: _mode == _Mode.lock
-              ? 'Your PDF now requires a password to open.'
-              : 'Password protection has been removed.',
-          confirmLabel: 'Share',
-          cancelLabel: 'Done',
-          onConfirm: () => FileService.shareFile(outputPath),
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-    } on PdfOperationException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ PDF processed successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+await FileService.shareFile(outputPath);
+
+} on PdfOperationException catch (e) {
       setState(() => _busy = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));

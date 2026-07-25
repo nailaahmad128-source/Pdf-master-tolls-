@@ -244,6 +244,161 @@ class _FillSignScreenState extends State<FillSignScreen> {
         _saving = false;
         _overlays.clear();
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ Signed PDF saved successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+await FileService.shareFile(outputPath);
+
+} on PdfOperationException catch (e) {
+      if (!mounted) return;
+      setState(() => _loadingPage = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Future<void> _changePage(int delta) async {
+    if (_pageCount == null) return;
+    final next = _pageIndex + delta;
+    if (next < 0 || next >= _pageCount!) return;
+    setState(() {
+      _pageIndex = next;
+      _overlays.clear();
+    });
+    await _loadPage();
+  }
+
+  Future<void> _openSignaturePad() async {
+    final controller = SignatureController(
+      penStrokeWidth: 3,
+      penColor: Colors.black,
+      exportBackgroundColor: Colors.transparent,
+    );
+    final bytes = await showModalBottomSheet<Uint8List>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Draw your signature', style: AppTextStyles.title(Theme.of(ctx).colorScheme.onSurface)),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 220,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Theme.of(ctx).colorScheme.outlineVariant),
+                  ),
+                  child: Signature(controller: controller, backgroundColor: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      label: 'Clear',
+                      icon: Icons.refresh_rounded,
+                      onPressed: controller.clear,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: PrimaryButton(
+                      label: 'Use signature',
+                      icon: Icons.check_rounded,
+                      onPressed: () async {
+                        if (controller.isEmpty) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(content: Text('Draw a signature first.')),
+                          );
+                          return;
+                        }
+                        final png = await controller.toPngBytes();
+                        if (ctx.mounted) Navigator.pop(ctx, png);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    controller.dispose();
+    if (bytes == null) return;
+    setState(() => _overlays.add(_Overlay.signature(bytes)));
+  }
+
+  Future<void> _addTextField() async {
+    final controller = TextEditingController();
+    final text = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add text'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'e.g. Date, full name, initials'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text.trim()), child: const Text('Add')),
+        ],
+      ),
+    );
+    if (text == null || text.isEmpty) return;
+    setState(() => _overlays.add(_Overlay.text(text)));
+  }
+
+  Future<void> _save() async {
+    if (_path == null || _overlays.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add a signature or text field first.')),
+      );
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      final signatures = _overlays
+          .where((o) => o.kind == _OverlayKind.signature)
+          .map((o) => SignaturePlacement(
+                pngBytes: o.pngBytes!,
+                xFraction: o.x,
+                yFraction: o.y,
+                widthFraction: o.width,
+                heightFraction: o.height,
+              ))
+          .toList();
+      final texts = _overlays
+          .where((o) => o.kind == _OverlayKind.text)
+          .map((o) => TextPlacement(text: o.text!, xFraction: o.x, yFraction: o.y, fontSize: o.fontSize))
+          .toList();
+
+      final outputPath = await PdfService.signPdf(
+        _path!,
+        pageIndex: _pageIndex,
+        signatures: signatures,
+        texts: texts,
+        outputName: 'Signed_PDF',
+      );
+      if (!mounted) return;
+      await context.read<LibraryProvider>().registerFile(outputPath);
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _overlays.clear();
+      });
       await AppDialog.show(
         context,
         AppDialog(
@@ -252,17 +407,8 @@ class _FillSignScreenState extends State<FillSignScreen> {
           title: 'PDF signed',
           message: 'Page ${_pageIndex + 1} now includes your signature and any text you added.',
           confirmLabel: 'Share',
-          cancelLabel: 'Done',
+          cancelLabel: 'Close',
           onConfirm: () => FileService.shareFile(outputPath),
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
         ),
       );
     } on PdfOperationException catch (e) {

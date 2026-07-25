@@ -92,28 +92,16 @@ class _ImageToolsScreenState extends State<ImageToolsScreen> {
         _creating = false;
         _imagePaths.clear();
       });
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: 'PDF created',
-          message: 'Your document is ready to share or save.',
-          confirmLabel: 'Share',
-          cancelLabel: 'Done',
-          onConfirm: () => FileService.shareFile(outputPath),
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-    } on PdfOperationException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ PDF has been saved successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+await FileService.shareFile(outputPath);
+
+} on PdfOperationException catch (e) {
       setState(() => _creating = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));

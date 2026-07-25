@@ -57,32 +57,16 @@ class _MergePdfScreenState extends State<MergePdfScreen> {
         _merging = false;
         _paths.clear();
       });
-      await AppDialog.show(
-        context,
-        AppDialog(
-          icon: Icons.check_circle_rounded,
-          iconColor: AppColors.pdfPrimary,
-          title: 'PDFs merged',
-          message: 'Your combined document is ready to share or save.',
-          confirmLabel: 'Share',
-          cancelLabel: 'Done',
-          onConfirm: () => FileService.shareFile(outputPath),
-          extraActions: [
-            PrimaryButton(
-              label: 'Open Files',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/files');
-              },
-            ),
-          ],
-        ),
-      );
-      // Safe placement: only after the user has dismissed the success
-      // dialog (task fully complete, nothing left to interrupt), and
-      // gated by AdsService's own frequency cap so it won't show on
-      // every single merge in a session.
-      await AdsService.maybeShowInterstitial();
+      ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✓ Merged PDF saved successfully.'),
+    duration: Duration(seconds: 2),
+  ),
+);
+
+await FileService.shareFile(outputPath);
+
+await AdsService.maybeShowInterstitial();
     } on PdfOperationException catch (e) {
       setState(() => _merging = false);
       if (!mounted) return;
