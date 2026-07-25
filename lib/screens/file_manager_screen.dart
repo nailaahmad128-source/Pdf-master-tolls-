@@ -13,14 +13,21 @@ import '../widgets/list_tiles.dart';
 import '../widgets/state_views.dart';
 
 class FileManagerScreen extends StatefulWidget {
-  const FileManagerScreen({super.key});
+  final int initialTab;
+
+  const FileManagerScreen({
+    super.key,
+    this.initialTab = 0,
+  });
 
   @override
   State<FileManagerScreen> createState() => _FileManagerScreenState();
 }
 
 class _FileManagerScreenState extends State<FileManagerScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabController = TabController(length: 3, vsync: this);
+  late final TabController _tabController;
+
+
   bool _gridView = false;
   String _query = '';
   FileTypeFilter _filter = FileTypeFilter.all;
@@ -34,6 +41,11 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _load();
   }
 
