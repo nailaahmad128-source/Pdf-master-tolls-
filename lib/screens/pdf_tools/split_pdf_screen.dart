@@ -138,8 +138,10 @@ class _SplitPdfScreenState extends State<SplitPdfScreen> {
                   actionLabel: 'Choose PDF',
                   onAction: _pickPdf,
                 )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              : SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Card(
                       shape: RoundedRectangleBorder(
@@ -190,6 +192,7 @@ class _SplitPdfScreenState extends State<SplitPdfScreen> {
                     ),
                   ],
                 ),
+              ),
         ),
       ),
     );
