@@ -54,7 +54,63 @@ class HomeScreen extends StatelessWidget {
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              sliver: 
+              sliver: SliverToBoxAdapter(child: const _WelcomeBanner()),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+              sliver: SliverToBoxAdapter(
+                child: SectionHeader(title: 'Categories', actionLabel: null, onActionTap: null),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 118,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: ToolCategory.values.where((e) => e != ToolCategory.scan).length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (_, i) => _CategoryChip(
+                      category: ToolCategory.values.where((e) => e != ToolCategory.scan).toList()[i],
+                      onTap: () => _openCategory(context, ToolCategory.values.where((e) => e != ToolCategory.scan).toList()[i]),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+              sliver: SliverToBoxAdapter(
+                child: SectionHeader(
+                  title: 'All Tools',
+                  actionLabel: 'See all',
+                  onActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PdfToolsScreen())),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.98,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) => ToolCard(item: grid[i], onTap: () => openTool(context, grid[i])),
+                  childCount: grid.length,
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+              sliver: SliverToBoxAdapter(
+                child: SectionHeader(
+                  title: 'Recent Files',
+                  actionLabel: 'See all',
+                  onActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FileManagerScreen())),
                 ),
               ),
             ),
