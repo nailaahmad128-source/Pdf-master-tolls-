@@ -338,6 +338,8 @@ void _showTrashActions(BuildContext context, LibraryFile file) {
   );
 }
 
+}
+
 class _FileGridOrList extends StatelessWidget {
   final List<LibraryFile> files;
   final bool gridView;
