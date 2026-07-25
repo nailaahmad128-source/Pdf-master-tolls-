@@ -34,15 +34,25 @@ class RasterPage {
 class PdfService {
   PdfService._();
 
-  static Future<Directory> _outputDir() async {
+  static Future<Directory> _outputDir([String? folder]) async {
     final docs = await getApplicationDocumentsDirectory();
-    final dir = Directory(p.join(docs.path, 'PDFMasterTools'));
-    if (!await dir.exists()) await dir.create(recursive: true);
+    final dir = Directory(
+      folder == null
+          ? p.join(docs.path, 'PDFMasterTools')
+          : p.join(docs.path, 'PDFMasterTools', folder),
+    );
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
     return dir;
   }
 
-  static Future<String> _uniquePath(String baseName, String extension) async {
-    final dir = await _outputDir();
+  static Future<String> _uniquePath(
+    String baseName,
+    String extension, {
+    String? folder,
+  }) async {
+    final dir = await _outputDir(folder);
     var candidate = p.join(dir.path, '$baseName.$extension');
     var counter = 1;
     while (await File(candidate).exists()) {
@@ -81,7 +91,7 @@ class PdfService {
           ),
         );
       }
-      final outPath = await _uniquePath(outputName, 'pdf');
+      final outPath = await _uniquePath(outputName, 'pdf', folder: 'Image to PDF');
       await File(outPath).writeAsBytes(await document.save());
       return outPath;
     } catch (e) {
@@ -130,7 +140,7 @@ class PdfService {
         }
         loaded.dispose();
       }
-      final outPath = await _uniquePath(outputName, 'pdf');
+      final outPath = await _uniquePath(outputName, 'pdf', folder: 'Merge');
       final savedBytes = await newDocument.save();
       await File(outPath).writeAsBytes(savedBytes);
       return outPath;
@@ -180,7 +190,7 @@ class PdfService {
           currentSection.pages.add().graphics.drawPdfTemplate(template, const Offset(0, 0));
         }
         final label = start == end ? 'page $start' : 'pages $start-$end';
-        final outPath = await _uniquePath('$outputName ($label)', 'pdf');
+        final outPath = await _uniquePath('$outputName ($label)', 'pdf', folder: 'Split');
         await File(outPath).writeAsBytes(await rangeDoc.save());
         rangeDoc.dispose();
         outputs.add(outPath);
@@ -272,7 +282,7 @@ class PdfService {
         );
       }
 
-      final outPath = await _uniquePath(outputName, 'pdf');
+      final outPath = await _uniquePath(outputName, 'pdf', folder: 'Fill & Sign');
       await File(outPath).writeAsBytes(await document.save());
       document.dispose();
       return outPath;
@@ -366,7 +376,7 @@ class PdfService {
             outBytes = Uint8List.fromList(img.encodeJpg(decoded, quality: 92));
           }
         }
-        final outPath = await _uniquePath('$outputName $pageNumber', ext);
+        final outPath = await _uniquePath('$outputName $pageNumber', ext, folder: 'PDF to Image');
         await File(outPath).writeAsBytes(outBytes);
         results.add(RasterPage(path: outPath, pageNumber: pageNumber));
         pageNumber++;
@@ -397,7 +407,7 @@ class PdfService {
       security.userPassword = password;
       security.ownerPassword = ownerPassword?.trim().isNotEmpty == true ? ownerPassword! : password;
       security.algorithm = PdfEncryptionAlgorithm.aesx256Bit;
-      final outPath = await _uniquePath(outputName, 'pdf');
+      final outPath = await _uniquePath(outputName, 'pdf', folder: 'Lock & Unlock');
       await File(outPath).writeAsBytes(await document.save());
       document.dispose();
       return outPath;
