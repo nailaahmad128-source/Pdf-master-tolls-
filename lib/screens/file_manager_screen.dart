@@ -257,7 +257,8 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
                 confirmLabel: 'Delete',
                 destructive: true,
                 onConfirm: () async {
-                  await library.deleteFile(file.path);
+                  await FileService.moveToTrash(file.path);
+await library.refresh();
                   await _load();
                 },
               ),
