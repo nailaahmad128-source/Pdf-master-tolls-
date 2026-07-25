@@ -38,7 +38,7 @@ void openTool(BuildContext context, ToolItem item) {
     case 'Fill & Sign':
       screen = const FillSignScreen();
       break;
-    case 'Lock & Unlock':
+    case '__REMOVED__':
       screen = const LockUnlockPdfScreen();
       break;
     case 'QR Scanner':
