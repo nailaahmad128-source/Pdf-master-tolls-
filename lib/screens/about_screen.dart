@@ -55,11 +55,12 @@ class AboutScreen extends StatelessWidget {
                   SettingsTile(
                     icon: Icons.code_rounded,
                     title: 'Open-source licenses',
-                    onTap: () => showLicensePage(
-                      context: context,
-                      applicationName: 'PDF Master Tools',
-                      applicationVersion: 'Version 1.0.0 (Build 1)',
-                    ),
+                    onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OpenSourceLicensesScreen(),
+                  ),
+                ),
                   ),
                 ],
               ),
