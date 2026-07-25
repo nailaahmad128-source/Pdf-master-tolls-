@@ -136,6 +136,12 @@ class _SettingsScreenState extends State<SettingsScreen> {  String _cacheSize = 
               title: 'Security & Backup',
               children: [
                 SettingsTile(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'Recycle Bin',
+                  subtitle: 'Restore or permanently delete files',
+                  onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+                ),
+                SettingsTile(
                   icon: Icons.delete_sweep_rounded,
                   title: 'Clear cache',
                   subtitle: _cacheSize,
