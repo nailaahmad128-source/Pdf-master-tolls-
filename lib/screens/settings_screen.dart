@@ -135,7 +135,6 @@ class _SettingsScreenState extends State<SettingsScreen> {  String _cacheSize = 
             _SettingsGroup(
               title: 'Security & Backup',
               children: [
-                ),
                 SettingsTile(
                   icon: Icons.cloud_upload_rounded,
                   title: 'Auto-backup files',
