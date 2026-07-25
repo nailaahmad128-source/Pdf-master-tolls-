@@ -181,7 +181,7 @@ class _SplitPdfScreenState extends State<SplitPdfScreen> {
                           ),
                         ),
                       ),
-                    const Spacer(),
+                    const SizedBox(height: 20),
                     PrimaryButton(
                       label: _splitting ? 'Splitting…' : 'Split PDF',
                       icon: Icons.call_split_rounded,
