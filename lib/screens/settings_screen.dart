@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:local_auth/local_auth.dart';
 import '../providers/library_provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/file_service.dart';
@@ -19,9 +18,7 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  final LocalAuthentication _localAuth = LocalAuthentication();
-  String _cacheSize = 'Calculating…';
+class _SettingsScreenState extends State<SettingsScreen> {  String _cacheSize = 'Calculating…';
 
   @override
   void initState() {
@@ -68,50 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
 
-  Future<void> _toggleBiometric(bool enable) async {
-    final settings = context.read<SettingsProvider>();
-
-    if (!enable) {
-      await settings.setBiometricLock(false);
-      return;
-    }
-
-    try {
-      final supported = await _localAuth.isDeviceSupported();
-      final canCheck = await _localAuth.canCheckBiometrics;
-
-      if (!supported || !canCheck) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Biometric authentication is not available on this device.'),
-          ),
-        );
-        return;
-      }
-
-      final authenticated = await _localAuth.authenticate(
-        localizedReason: 'Authenticate to enable app lock',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
-
-      await settings.setBiometricLock(authenticated);
-    } catch (e) {
-      debugPrint('Biometric Error: $e');
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Biometric authentication failed.'),
-        ),
-      );
-    }
-  }
-
-  @override
+    @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final settings = context.watch<SettingsProvider>();
@@ -181,13 +135,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _SettingsGroup(
               title: 'Security & Backup',
               children: [
-                SettingsTile(
-                  icon: Icons.fingerprint_rounded,
-                  title: 'Biometric app lock',
-                  trailing: Switch(
-                    value: settings.biometricLock,
-                    onChanged: _toggleBiometric,
-                  ),
                 ),
                 SettingsTile(
                   icon: Icons.cloud_upload_rounded,
