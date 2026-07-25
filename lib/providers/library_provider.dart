@@ -120,7 +120,14 @@ class LibraryProvider extends ChangeNotifier {
   /// disk. Call this after a bulk file-system wipe (e.g. Settings ->
   /// Clear cache) so lists don't keep showing entries that now point at
   /// deleted files.
+  
+  Future<void> refresh() async {
+    _load();
+    notifyListeners();
+  }
+
   Future<void> clearAll() async {
+
     await LocalStore.instance.clearBucket(StoreKeys.recentFiles);
     await LocalStore.instance.clearBucket(StoreKeys.favoriteFiles);
     _load();

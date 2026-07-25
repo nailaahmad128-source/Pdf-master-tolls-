@@ -136,14 +136,6 @@ class _SettingsScreenState extends State<SettingsScreen> {  String _cacheSize = 
               title: 'Security & Backup',
               children: [
                 SettingsTile(
-                  icon: Icons.cloud_upload_rounded,
-                  title: 'Auto-backup files',
-                  trailing: Switch(
-                    value: settings.autoBackup,
-                    onChanged: (v) => settings.setAutoBackup(v),
-                  ),
-                ),
-                SettingsTile(
                   icon: Icons.delete_sweep_rounded,
                   title: 'Clear cache',
                   subtitle: _cacheSize,
