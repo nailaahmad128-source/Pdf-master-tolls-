@@ -67,6 +67,15 @@ class _MergePdfScreenState extends State<MergePdfScreen> {
           confirmLabel: 'Share',
           cancelLabel: 'Done',
           onConfirm: () => FileService.shareFile(outputPath),
+          extraActions: [
+            PrimaryButton(
+              label: 'Open Files',
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/files');
+              },
+            ),
+          ],
         ),
       );
       // Safe placement: only after the user has dismissed the success

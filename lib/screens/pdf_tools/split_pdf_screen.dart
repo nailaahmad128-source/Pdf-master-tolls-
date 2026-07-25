@@ -108,6 +108,15 @@ class _SplitPdfScreenState extends State<SplitPdfScreen> {
               await FileService.shareFile(out);
             }
           },
+          extraActions: [
+            PrimaryButton(
+              label: 'Open Files',
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/files');
+              },
+            ),
+          ],
         ),
       );
     } on PdfOperationException catch (e) {

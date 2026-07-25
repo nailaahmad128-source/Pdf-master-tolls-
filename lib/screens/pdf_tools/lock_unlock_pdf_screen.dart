@@ -88,6 +88,15 @@ class _LockUnlockPdfScreenState extends State<LockUnlockPdfScreen> {
           confirmLabel: 'Share',
           cancelLabel: 'Done',
           onConfirm: () => FileService.shareFile(outputPath),
+          extraActions: [
+            PrimaryButton(
+              label: 'Open Files',
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/files');
+              },
+            ),
+          ],
         ),
       );
     } on PdfOperationException catch (e) {

@@ -13,6 +13,7 @@ class AppDialog extends StatelessWidget {
   final String cancelLabel;
   final VoidCallback? onConfirm;
   final bool destructive;
+  final List<Widget> extraActions;
 
   const AppDialog({
     super.key,
@@ -24,6 +25,7 @@ class AppDialog extends StatelessWidget {
     this.cancelLabel = 'Cancel',
     this.onConfirm,
     this.destructive = false,
+    this.extraActions = const [],
   });
 
   static Future<void> show(BuildContext context, AppDialog dialog) {
@@ -51,6 +53,11 @@ class AppDialog extends StatelessWidget {
             const SizedBox(height: 8),
             Text(message,
                 style: AppTextStyles.bodyMedium(theme.colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+            if (extraActions.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ...extraActions,
+              const SizedBox(height: 20),
+            ],
             const SizedBox(height: 24),
             Row(
               children: [

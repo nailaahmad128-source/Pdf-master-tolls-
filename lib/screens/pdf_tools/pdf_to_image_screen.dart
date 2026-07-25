@@ -72,6 +72,15 @@ class _PdfToImageScreenState extends State<PdfToImageScreen> {
               await FileService.shareFile(page.path);
             }
           },
+          extraActions: [
+            PrimaryButton(
+              label: 'Open Files',
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/files');
+              },
+            ),
+          ],
         ),
       );
     } on PdfOperationException catch (e) {
