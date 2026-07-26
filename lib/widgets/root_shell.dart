@@ -3,6 +3,7 @@ import 'package:animations/animations.dart';
 import '../screens/home_screen.dart';
 import '../screens/pdf_tools_screen.dart';
 import '../screens/file_manager_screen.dart';
+import '../screens/my_work_screen.dart';
 
 
 /// Hosts the four primary destinations behind a premium NavigationBar,
