@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:open_filex/open_filex.dart';
 
 import '../core/storage/local_store.dart';
 import '../models/library_file.dart';
@@ -223,6 +224,13 @@ class FileService {
       StoreKeys.trashFiles,
       trashPath,
     );
+  }
+
+  static Future<void> openFile(String path) async {
+    final result = await OpenFilex.open(path);
+    if (result.type != ResultType.done) {
+      throw StateError(result.message);
+    }
   }
 
   static Future<void> delete(String path) async {

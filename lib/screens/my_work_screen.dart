@@ -391,7 +391,7 @@ class _FileGridOrList extends StatelessWidget {
           file: files[i],
           isFavorite: isFavorite(files[i].path),
           meta: '${files[i].readableSize} · ${relativeDate(files[i].modifiedAt)}',
-          onTap: () => onMore(files[i]),
+          onTap: () async => await FileService.openFile(files[i].path),
         ),
       );
     }
