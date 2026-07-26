@@ -30,6 +30,12 @@ class _QrToolsScreenState extends State<QrToolsScreen> {
   int _tab = 1; // 0 = Scan, 1 = Generate
 
   @override
+  void initState() {
+    super.initState();
+    _tab = widget.initialTab;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
@@ -132,7 +138,6 @@ class _ScannerViewState extends State<_ScannerView> {
   @override
   void initState() {
     super.initState();
-    _tab = widget.initialTab;
     _requestPermission();
   }
 
