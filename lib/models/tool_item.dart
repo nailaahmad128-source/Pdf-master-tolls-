@@ -65,7 +65,6 @@ class ToolCatalog {
       category: ToolCategory.pdf,
     ),
     ToolItem(
-      title: 'Lock & Unlock',
       subtitle: 'Password-protect your files',
       icon: Icons.lock_rounded,
       category: ToolCategory.pdf,
