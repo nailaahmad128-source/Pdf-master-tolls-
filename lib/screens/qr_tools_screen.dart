@@ -19,7 +19,8 @@ import '../widgets/app_buttons.dart';
 import '../widgets/dialogs_and_sheets.dart';
 
 class QrToolsScreen extends StatefulWidget {
-  const QrToolsScreen({super.key});
+  final int initialTab;
+  const QrToolsScreen({super.key, this.initialTab = 1});
 
   @override
   State<QrToolsScreen> createState() => _QrToolsScreenState();
@@ -131,6 +132,7 @@ class _ScannerViewState extends State<_ScannerView> {
   @override
   void initState() {
     super.initState();
+    _tab = widget.initialTab;
     _requestPermission();
   }
 

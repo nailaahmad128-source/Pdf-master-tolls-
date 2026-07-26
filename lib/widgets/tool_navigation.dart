@@ -34,10 +34,15 @@ void openTool(BuildContext context, ToolItem item) {
       screen = const PdfToImageScreen();
       break;
     case 'Fill & Sign':
-    case '__REMOVED__':
+    screen = null;
+    break;
+
     case 'QR Scanner':
+      screen = const QrToolsScreen(initialTab: 0);
+      break;
+
     case 'QR Generator':
-      screen = const QrToolsScreen();
+      screen = const QrToolsScreen(initialTab: 1);
       break;
     case 'Unit Converter':
     case 'Currency Converter':
