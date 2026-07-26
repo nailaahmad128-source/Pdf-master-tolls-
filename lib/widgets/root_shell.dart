@@ -21,8 +21,8 @@ class _RootShellState extends State<RootShell> {
   static const _screens = [
     HomeScreen(),
     PdfToolsScreen(),
-    FileManagerScreen(),
-    FileManagerScreen(),
+    MyWorkScreen(),
+    MyWorkScreen(),
   ];
 
   static const _destinations = [
