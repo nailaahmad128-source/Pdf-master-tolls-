@@ -46,7 +46,6 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final favorites = ToolCatalog.favorites();
     final grid = ToolCatalog.all.take(8).toList();
-    final recents = context.watch<LibraryProvider>().recents.take(3).toList();
 
     return Scaffold(
       body: SafeArea(
@@ -84,7 +83,7 @@ class HomeScreen extends StatelessWidget {
               sliver: SliverToBoxAdapter(
                 child: SectionHeader(
                   title: 'All Tools',
-                  actionLabel: 'See all',
+                  
                   onActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PdfToolsScreen())),
                 ),
               ),
@@ -108,44 +107,12 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
               sliver: SliverToBoxAdapter(
                 child: SectionHeader(
-                  title: 'Recent Files',
-                  actionLabel: 'See all',
-                  onActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FileManagerScreen())),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-              sliver: recents.isEmpty
-                  ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          'Files you create will show up here.',
-                          style: AppTextStyles.bodySmall(theme.colorScheme.onSurfaceVariant),
-                        ),
-                      ),
-                    )
-                  : SliverList.list(
-                      children: recents
-                          .map(
-                            (f) => FileListTile(
-                              name: f.name,
-                              meta: '${f.readableSize} · ${_relativeDate(f.modifiedAt)}',
-                              icon: f.type == LibraryFileType.pdf ? Icons.picture_as_pdf_rounded : Icons.image_rounded,
-                              iconColor: f.type == LibraryFileType.pdf ? AppColors.pdfPrimary : AppColors.scanPrimary,
-                              iconBg: f.type == LibraryFileType.pdf ? AppColors.pdfSoft : AppColors.scanSoft,
-                              isFavorite: context.watch<LibraryProvider>().isFavorite(f.path),
-                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FileManagerScreen())),
-                            ),
-                          )
-                          .toList(),
-                    ),
-            ),
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: AdBannerWidget(),
+              ),
+            ),
               ),
             ),
           ],
