@@ -1,8 +1,136 @@
-class QrGeneratorScreen extends StatefulWidget {
-  const QrGeneratorScreen();
+class _ScannerView extends StatefulWidget {
+  const _ScannerView();
 
   @override
-  State<QrGeneratorScreen> createState() => _QrGeneratorScreenState();
+  State<_ScannerView> createState() => _ScannerViewState();
+}
+
+class _ScannerViewState extends State<_ScannerView> {
+  MobileScannerController? _controller;
+  PermissionOutcome? _permissionOutcome;
+  bool _handledThisScan = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermission();
+  }
+
+  Future<void> _requestPermission() async {
+    final outcome = await PermissionService.camera();
+    if (!mounted) return;
+    setState(() {
+      _permissionOutcome = outcome;
+      if (outcome == PermissionOutcome.granted) {
+        _controller = MobileScannerController(detectionSpeed: DetectionSpeed.noDuplicates);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onDetect(BarcodeCapture capture) async {
+    if (_handledThisScan) return;
+    final value = capture.barcodes.firstOrNull?.rawValue;
+    if (value == null || value.isEmpty) return;
+    _handledThisScan = true;
+    await _controller?.stop();
+
+    await QrHistoryStore.add(title: value, subtitle: 'Scanned', payload: value);
+
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('QR code detected'),
+        content: SelectableText(value),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              FileService.shareText(value);
+            },
+            child: const Text('Share'),
+          ),
+        ],
+      ),
+    );
+    _handledThisScan = false;
+    await _controller?.start();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_permissionOutcome == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_permissionOutcome != PermissionOutcome.granted) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.no_photography_rounded, size: 48, color: Colors.grey),
+            const SizedBox(height: 16),
+            const Text('Camera access is needed to scan QR codes.', textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            PrimaryButton(label: 'Grant camera access', expand: false, onPressed: _requestPermission),
+          ],
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            MobileScanner(controller: _controller, onDetect: _onDetect),
+            IgnorePointer(
+              child: FractionallySizedBox(
+                widthFactor: 0.6,
+                heightFactor: 0.32,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.qrPrimary, width: 3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              bottom: 24,
+              child: Text('Point camera at a QR code', style: TextStyle(color: Colors.white70)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+extension _FirstOrNull<T> on List<T> {
+  T? get firstOrNull => isEmpty ? null : first;
+}
+
+// ---------------------------------------------------------------------
+// Generate tab
+// ---------------------------------------------------------------------
+
+class _GeneratorForm extends StatefulWidget {
+  const _GeneratorForm();
+
+  @override
+  State<_GeneratorForm> createState() => _GeneratorFormState();
 }
 
 class _GeneratorFormState extends State<_GeneratorForm> {
