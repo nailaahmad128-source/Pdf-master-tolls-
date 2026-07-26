@@ -33,8 +33,8 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   FileTypeFilter _filter = FileTypeFilter.all;
   FileSortOrder _sort = FileSortOrder.dateNewest;
 
-  List<LibraryFile> _allMy Work = [];
-  List<LibraryFile> _trashMy Work = [];
+  List<LibraryFile> _allFiles = [];
+  List<LibraryFile> _trashFiles = [];
   bool _loading = true;
   ({int usedBytes, int fileCount})? _storage;
 
@@ -52,19 +52,19 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   Future<void> _load() async {
     setState(() => _loading = true);
     final files = await FileService.listAll();
-    final trash = await FileService.listTrashMy Work();
+    final trash = await FileService.listTrashFiles();
     final storage = await FileService.storageSummary();
     if (!mounted) return;
     setState(() {
-      _allMy Work = files;
-      _trashMy Work = trash;
+      _allFiles = files;
+      _trashFiles = trash;
       _storage = storage;
       _loading = false;
     });
   }
 
-  List<LibraryFile> get _visibleMy Work {
-    var files = FileService.applyFilterAndSearch(_allMy Work, filter: _filter, query: _query);
+  List<LibraryFile> get _visibleFiles {
+    var files = FileService.applyFilterAndSearch(_allFiles, filter: _filter, query: _query);
     files = FileService.applySort(files, _sort);
     return files;
   }
@@ -81,7 +81,7 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final library = context.watch<LibraryProvider>();
-    final visible = _visibleMy Work;
+    final visible = _visibleFiles;
     final favorites = visible.where((f) => library.isFavorite(f.path)).toList();
 
     return Scaffold(
@@ -103,7 +103,7 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
           unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
           labelStyle: AppTextStyles.label(AppColors.brandIndigo),
           indicatorColor: AppColors.brandIndigo,
-          tabs: const [Tab(text: 'All My Work'), Tab(text: 'Favorites'), Tab(text: 'Recently Deleted')],
+          tabs: const [Tab(text: 'All Files'), Tab(text: 'Favorites'), Tab(text: 'Recently Deleted')],
         ),
       ),
       body: SafeArea(
@@ -147,7 +147,7 @@ class _FileManagerScreenState extends State<FileManagerScreen> with SingleTicker
                             onMore: (f) => _showFileActions(context, f),
                           ),
                           _FileGridOrList(
-                            files: _trashMy Work,
+                            files: _trashFiles,
                             gridView: _gridView,
                             isFavorite: library.isFavorite,
                             relativeDate: _relativeDate,
@@ -374,7 +374,7 @@ class _FileGridOrList extends StatelessWidget {
       return const EmptyStateView(
         icon: Icons.folder_open_rounded,
         title: 'No files yet',
-        message: 'My Work you scan, create or convert will show up here.',
+        message: 'Files you scan, create or convert will show up here.',
       );
     }
     if (gridView) {
