@@ -21,10 +21,10 @@ class MyWorkScreen extends StatefulWidget {
   });
 
   @override
-  State<FileManagerScreen> createState() => _FileManagerScreenState();
+  State<MyWorkScreen> createState() => _FileManagerScreenState();
 }
 
-class _FileManagerScreenState extends State<FileManagerScreen> with SingleTickerProviderStateMixin {
+class _FileManagerScreenState extends State<MyWorkScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
 
