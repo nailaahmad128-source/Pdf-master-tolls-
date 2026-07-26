@@ -65,11 +65,6 @@ class ToolCatalog {
       category: ToolCategory.pdf,
     ),
     ToolItem(
-      subtitle: 'Password-protect your files',
-      icon: Icons.lock_rounded,
-      category: ToolCategory.pdf,
-    ),
-    ToolItem(
       title: 'QR Scanner',
       subtitle: 'Scan any QR instantly',
       icon: Icons.qr_code_scanner_rounded,
