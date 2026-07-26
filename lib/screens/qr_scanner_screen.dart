@@ -18,15 +18,15 @@ import '../theme/app_text_styles.dart';
 import '../widgets/app_buttons.dart';
 import '../widgets/dialogs_and_sheets.dart';
 
-class QrToolsScreen extends StatefulWidget {
+class QrScannerScreen extends StatefulWidget {
   final int initialTab;
-  const QrToolsScreen({super.key, this.initialTab = 1});
+  const QrScannerScreen({super.key, this.initialTab = 1});
 
   @override
-  State<QrToolsScreen> createState() => _QrToolsScreenState();
+  State<QrScannerScreen> createState() => _QrScannerScreenState();
 }
 
-class _QrToolsScreenState extends State<QrToolsScreen> {
+class _QrScannerScreenState extends State<QrScannerScreen> {
   int _tab = 1; // 0 = Scan, 1 = Generate
 
   @override
