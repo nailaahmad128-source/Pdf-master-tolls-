@@ -6,7 +6,8 @@ import '../screens/pdf_tools/compress_pdf_screen.dart';
 import '../screens/pdf_tools/merge_pdf_screen.dart';
 import '../screens/pdf_tools/pdf_to_image_screen.dart';
 import '../screens/pdf_tools/split_pdf_screen.dart';
-import '../screens/qr_tools_screen.dart';
+import '../screens/qr_scanner_screen.dart';
+import '../screens/qr_generator_screen.dart';
 import '../screens/scanner_screen.dart';
 
 /// Maps a [ToolItem] to the screen that implements it. Every PDF-family
@@ -38,11 +39,11 @@ void openTool(BuildContext context, ToolItem item) {
     break;
 
     case 'QR Scanner':
-      screen = const QrToolsScreen(initialTab: 0);
+      screen = const QrScannerScreen();
       break;
 
     case 'QR Generator':
-      screen = const QrToolsScreen(initialTab: 1);
+      screen = const QrGeneratorScreen();
       break;
     case 'Unit Converter':
     case 'Currency Converter':
