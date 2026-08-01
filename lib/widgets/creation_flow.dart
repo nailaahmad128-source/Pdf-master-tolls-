@@ -568,14 +568,16 @@ Future<void> _share(BuildContext context) async {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Flexible(fit: FlexFit.tight, child:
+                  Flexible(
+                    fit: FlexFit.tight,
                     child: FilledButton.icon(
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 20),
                       label: const FittedBox(child: Text('Open')),
                     ),
                   ),
-                  Flexible(fit: FlexFit.tight, child:
+                  Flexible(
+                    fit: FlexFit.tight,
                     child: FilledButton.icon(
                       onPressed: () => _saveToFiles(context),
                       icon: const Icon(Icons.save_alt_rounded, size: 20),
