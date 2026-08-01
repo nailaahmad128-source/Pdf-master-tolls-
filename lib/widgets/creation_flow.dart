@@ -579,7 +579,7 @@ Future<void> _share(BuildContext context) async {
                     child: FilledButton.icon(
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 20),
-                      label: const FittedBox(child: Text('Open')),
+                      label: const Text('Open', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                     ),
                   ),
                   Flexible(
@@ -587,14 +587,14 @@ Future<void> _share(BuildContext context) async {
                     child: FilledButton.icon(
                       onPressed: () => _saveToFiles(context),
                       icon: const Icon(Icons.save_alt_rounded, size: 20),
-                      label: const FittedBox(child: Text('Save')),
+                      label: const Text('Save', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                     ),
                   ),
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () => _share(context),
                       icon: const Icon(Icons.ios_share_rounded, size: 20),
-                      label: const FittedBox(child: Text('Share')),
+                      label: const Text('Share', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                     ),
                   ),
                   IconButton(
