@@ -609,8 +609,8 @@ class _PagePreview extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.pdfPrimary, width: 1.5),
-                              color: Colors.white.withOpacity(0.6),
+                              border: Border.all(color: AppColors.pdfPrimary.withOpacity(0.6), width: 0.8),
+                              color: Colors.transparent,
                             ),
                             child: Stack(
                               clipBehavior: Clip.none,
@@ -631,15 +631,15 @@ class _PagePreview extends StatelessWidget {
                                   child: GestureDetector(
                                     onTap: () => onOverlayCopied(i),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: const BoxDecoration(
                                         color: Colors.blue,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.copy_rounded,
-                                        size: 14,
+                                        size: 8,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -651,10 +651,10 @@ class _PagePreview extends StatelessWidget {
                                   child: GestureDetector(
                                     onTap: () => onOverlayRemoved(i),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
-                                      child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+                                      child: const Icon(Icons.close_rounded, size: 8, color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -668,15 +668,15 @@ class _PagePreview extends StatelessWidget {
                                       -details.delta.dy / box.maxHeight,
                                     ),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: const BoxDecoration(
                                         color: AppColors.brandIndigo,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.open_in_full_rounded,
-                                        size: 12,
+                                        size: 8,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -693,15 +693,15 @@ Positioned(
                                       details.delta.dy / box.maxHeight,
                                     ),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: const BoxDecoration(
                                         color: AppColors.brandIndigo,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.open_in_full_rounded,
-                                        size: 12,
+                                        size: 8,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -721,15 +721,15 @@ Positioned(
                                       -details.delta.dy / box.maxHeight,
                                     ),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: const BoxDecoration(
                                         color: AppColors.brandIndigo,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.open_in_full_rounded,
-                                        size: 12,
+                                        size: 8,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -746,10 +746,10 @@ Positioned(
                                       details.delta.dy / box.maxHeight,
                                     ),
                                     child: Container(
-                                      width: 22,
-                                      height: 22,
+                                      width: 12,
+                                      height: 12,
                                       decoration: BoxDecoration(color: AppColors.brandIndigo, shape: BoxShape.circle),
-                                      child: const Icon(Icons.open_in_full_rounded, size: 12, color: Colors.white),
+                                      child: const Icon(Icons.open_in_full_rounded, size: 8, color: Colors.white),
                                     ),
                                   ),
                                 ),
