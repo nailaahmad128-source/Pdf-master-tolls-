@@ -552,8 +552,8 @@ Future<void> _share(BuildContext context) async {
                     child: Icon(icon, color: color, size: 18),
                   ),
                   const SizedBox(width: 12),
-                  Flexible(
-                    fit: FlexFit.tight,
+                  Expanded(
+
                     child: Column(
                       children: [
                         Text(
@@ -574,27 +574,27 @@ Future<void> _share(BuildContext context) async {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Flexible(
-                    fit: FlexFit.tight,
+                  Expanded(
+
                     child: FilledButton.icon(
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 20),
-                      label: const Text('Open', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      label: const FittedBox(child: Text('Open', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                     ),
                   ),
-                  Flexible(
-                    fit: FlexFit.tight,
+                  Expanded(
+
                     child: FilledButton.icon(
                       onPressed: () => _saveToFiles(context),
                       icon: const Icon(Icons.save_alt_rounded, size: 20),
-                      label: const Text('Save', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      label: const FittedBox(child: Text('Save', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                     ),
                   ),
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () => _share(context),
                       icon: const Icon(Icons.ios_share_rounded, size: 20),
-                      label: const Text('Share', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      label: const FittedBox(child: Text('Share', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                     ),
                   ),
                   IconButton(
