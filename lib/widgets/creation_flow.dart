@@ -546,9 +546,9 @@ Future<void> _share(BuildContext context) async {
                     child: Icon(icon, color: color, size: 18),
                   ),
                   const SizedBox(width: 12),
-                  Flexible(fit: FlexFit.tight, child:
+                  Flexible(
+                    fit: FlexFit.tight,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           entry.title,
