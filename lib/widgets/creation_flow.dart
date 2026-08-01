@@ -557,24 +557,24 @@ Future<void> _share(BuildContext context) async {
               Row(
                 children: [
                   Expanded(
-                    child: TextButton.icon(
+                    child: FilledButton.icon(
                       onPressed: () => _open(context),
-                      icon: const Icon(Icons.visibility_outlined, size: 16),
-                      label: const Text('Open'),
+                      icon: const Icon(Icons.visibility_outlined, size: 20),
+                      label: const FittedBox(child: Text('Open')),
                     ),
                   ),
                   Expanded(
-                    child: TextButton.icon(
+                    child: FilledButton.icon(
                       onPressed: () => _saveToFiles(context),
-                      icon: const Icon(Icons.save_alt_rounded, size: 16),
-                      label: const Text('Save'),
+                      icon: const Icon(Icons.save_alt_rounded, size: 20),
+                      label: const FittedBox(child: Text('Save')),
                     ),
                   ),
                   Expanded(
-                    child: TextButton.icon(
+                    child: FilledButton.icon(
                       onPressed: () => _share(context),
-                      icon: const Icon(Icons.ios_share_rounded, size: 16),
-                      label: const Text('Share'),
+                      icon: const Icon(Icons.ios_share_rounded, size: 20),
+                      label: const FittedBox(child: Text('Share')),
                     ),
                   ),
                   IconButton(
