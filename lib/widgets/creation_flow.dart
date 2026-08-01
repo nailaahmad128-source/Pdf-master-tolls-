@@ -327,7 +327,13 @@ class FileHistoryCard extends StatelessWidget {
     final src=File(paths.first);
     final dst=File("${base.path}/${src.uri.pathSegments.last}");
 
-    await src.copy(dst.path);
+    
+try {
+  await src.copy(dst.path);
+} catch (e) {
+  await dst.writeAsBytes(await src.readAsBytes(), flush: true);
+}
+
 
 if (context.mounted) {
   ScaffoldMessenger.of(context).showSnackBar(
