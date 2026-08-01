@@ -576,14 +576,14 @@ Future<void> _share(BuildContext context) async {
                 children: [
                   Expanded(
 
-                    child: FilledButton.icon(
+                    child: TextButton.icon(
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 20),
                       label: const FittedBox(child: Text('Open', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                     ),
                   ),
                   Expanded(
-                    child: FilledButton.icon(
+                    child: TextButton.icon(
                       onPressed: () => _share(context),
                       icon: const Icon(Icons.ios_share_rounded, size: 20),
                       label: const FittedBox(child: Text('Share', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
