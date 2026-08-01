@@ -546,7 +546,6 @@ void _removeOverlay(int index) {
                 ],
               ),
       ),
-    ),
     );
   }
 }
@@ -573,18 +572,7 @@ class _PagePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InteractiveViewer(
-minScale: 1,
-maxScale: 6,
-boundaryMargin: const EdgeInsets.all(200),
-panEnabled: true,
-scaleEnabled: true,
-child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
-onDoubleTap: () {},
-child: Center(
+    return Center(
       child: AspectRatio(
         // Sizing the box to the page's own aspect ratio (rather than
         // filling the available area with BoxFit.contain) keeps the
@@ -612,10 +600,7 @@ child: Center(
                       return Positioned(
                         left: o.x * box.maxWidth,
                         top: o.y * box.maxHeight,
-                        child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                        child: GestureDetector(
                           onPanUpdate: (details) => onOverlayMoved(
                             i,
                             details.delta.dx / box.maxWidth,
@@ -643,10 +628,7 @@ child: Center(
                                 Positioned(
                                   top: -12,
                                   left: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onTap: () => onOverlayCopied(i),
                                     child: Container(
                                       width: 12,
@@ -662,15 +644,11 @@ child: Center(
                                       ),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
                                 Positioned(
                                   top: -12,
                                   right: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onTap: () => onOverlayRemoved(i),
                                     child: Container(
                                       width: 12,
@@ -679,15 +657,11 @@ child: Center(
                                       child: const Icon(Icons.close_rounded, size: 8, color: Colors.white),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
                                 Positioned(
                                   top: -12,
                                   left: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       -details.delta.dx / box.maxWidth,
@@ -707,16 +681,12 @@ child: Center(
                                       ),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
 
 Positioned(
                                   bottom: -12,
                                   left: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       -details.delta.dx / box.maxWidth,
@@ -736,8 +706,7 @@ Positioned(
                                       ),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
 
                                 // Drag handle to resize this overlay in
                                 // place, separate from the move gesture
@@ -745,10 +714,7 @@ Positioned(
                                 Positioned(
                                   top: -12,
                                   right: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       details.delta.dx / box.maxWidth,
@@ -768,16 +734,12 @@ Positioned(
                                       ),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
 
 Positioned(
                                   bottom: -12,
                                   right: -12,
-                                  child: SizedBox(
-  width: 40,
-  height: 40,
-  child: GestureDetector(
+                                  child: GestureDetector(
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       details.delta.dx / box.maxWidth,
@@ -790,8 +752,7 @@ Positioned(
                                       child: const Icon(Icons.open_in_full_rounded, size: 8, color: Colors.white),
                                     ),
                                   ),
-                              ),
-                            ),
+                                ),
                               ],
                             ),
                           ),
