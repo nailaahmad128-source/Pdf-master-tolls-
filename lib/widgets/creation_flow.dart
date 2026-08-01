@@ -329,6 +329,18 @@ class FileHistoryCard extends StatelessWidget {
 
     await src.copy(dst.path);
 
+if (context.mounted) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        '✅ File saved successfully\n📂 PDF Master Tools/Saved Files',
+      ),
+      duration: Duration(seconds: 3),
+    ),
+  );
+}
+
+
     if(context.mounted){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
