@@ -534,7 +534,7 @@ Future<void> _share(BuildContext context) async {
                     child: Icon(icon, color: color, size: 18),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
+                  Flexible(fit: FlexFit.tight, child:
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -556,14 +556,14 @@ Future<void> _share(BuildContext context) async {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Expanded(
+                  Flexible(fit: FlexFit.tight, child:
                     child: FilledButton.icon(
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 20),
                       label: const FittedBox(child: Text('Open')),
                     ),
                   ),
-                  Expanded(
+                  Flexible(fit: FlexFit.tight, child:
                     child: FilledButton.icon(
                       onPressed: () => _saveToFiles(context),
                       icon: const Icon(Icons.save_alt_rounded, size: 20),
