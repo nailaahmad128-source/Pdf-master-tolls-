@@ -583,14 +583,6 @@ Future<void> _share(BuildContext context) async {
                     ),
                   ),
                   Expanded(
-
-                    child: FilledButton.icon(
-                      onPressed: () => _saveToFiles(context),
-                      icon: const Icon(Icons.save_alt_rounded, size: 20),
-                      label: const FittedBox(child: Text('Save', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-                    ),
-                  ),
-                  Expanded(
                     child: FilledButton.icon(
                       onPressed: () => _share(context),
                       icon: const Icon(Icons.ios_share_rounded, size: 20),
