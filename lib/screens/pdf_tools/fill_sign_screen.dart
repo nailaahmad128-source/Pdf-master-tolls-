@@ -508,6 +508,7 @@ void _removeOverlay(int index) {
                               onOverlayMoved: _moveOverlay,
                               onOverlayResized: _resizeOverlay,
                               onOverlayRemoved: _removeOverlay,
+                  onOverlayCopied: _copyOverlay,
                             ),
                           ),
                   ),
@@ -556,6 +557,7 @@ class _PagePreview extends StatelessWidget {
   final void Function(int index, double dx, double dy) onOverlayMoved;
   final void Function(int index, double dx, double dy) onOverlayResized;
   final void Function(int index) onOverlayRemoved;
+  final void Function(int index) onOverlayCopied;
 
   const _PagePreview({
     required this.pageBytes,
@@ -564,6 +566,7 @@ class _PagePreview extends StatelessWidget {
     required this.onOverlayMoved,
     required this.onOverlayResized,
     required this.onOverlayRemoved,
+    required this.onOverlayCopied,
   });
 
   @override
@@ -626,7 +629,7 @@ class _PagePreview extends StatelessWidget {
                                   top: -12,
                                   left: -12,
                                   child: GestureDetector(
-                                    onTap: () => _copyOverlay(i),
+                                    onTap: () => onOverlayCopied(i),
                                     child: Container(
                                       width: 22,
                                       height: 22,
