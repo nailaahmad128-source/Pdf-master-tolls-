@@ -1,0 +1,591 @@
+import 'dart:io';
+import 'dart:ui' show PointMode;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
+import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
+
+import '../core/permissions/permission_service.dart';
+import '../providers/library_provider.dart';
+import '../providers/settings_provider.dart';
+import '../services/file_service.dart';
+import '../services/pdf_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import '../widgets/app_buttons.dart';
+import '../widgets/creation_flow.dart';
+import '../widgets/dialogs_and_sheets.dart';
+
+/// Document scanner. The animated edge-detection viewfinder below is this
+/// screen's "ready to capture" chrome. Capture itself is currently done
+/// one page at a time via the device camera (`image_picker`); each tap
+/// of the shutter takes one photo, which is then run through the filter
+/// pipeline below and appended to the page list. (A native
+/// multi-page/edge-detecting document scanner previously backed this
+/// screen via `flutter_doc_scanner`; that package has been removed from
+/// the project, so this is a temporary capture path until a v2-embedding
+/// compatible replacement is added.)
+class ScannerScreen extends StatefulWidget {
+  const ScannerScreen({super.key});
+
+  @override
+  State<ScannerScreen> createState() => _ScannerScreenState();
+}
+
+class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProviderStateMixin {
+  bool _flashOn = false;
+  int _filterIndex = 0;
+  final _filters = const ['Auto', 'B&W', 'Grayscale', 'Original', 'HD'];
+  final List<String> _pages = [];
+  bool _scanning = false;
+  bool _savingPdf = false;
+  bool _savingImages = false;
+
+  late final AnimationController _scanController =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat(reverse: true);
+
+  @override
+void initState() {
+  super.initState();
+  _startScanner();
+}
+
+Future<void> _startScanner() async {
+  await _initCamera();
+
+  if (!mounted) return;
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _scan();
+  });
+}
+
+  Future<void> _initCamera() async {
+  _cameras = await availableCameras();
+  if (_cameras.isEmpty) return;
+  _cameraController = CameraController(_cameras.first, ResolutionPreset.high);
+  await _cameraController!.initialize();
+
+  _minZoom = await _cameraController!.getMinZoomLevel();
+  _maxZoom = await _cameraController!.getMaxZoomLevel();
+  _currentZoom = _minZoom;
+
+  if (!mounted) return;
+  setState(() => _cameraReady = true);
+}
+
+void dispose() {
+    _cameraController?.dispose();
+  _scanController.dispose();
+    super.dispose();
+  }
+
+  /// Applies the selected filter chip to a freshly captured page and
+  /// writes the result into the app's working directory so every page
+  /// this screen manages lives in one predictable place.
+  Future<String> _applyFilterAndStore(String sourcePath) async {
+    final bytes = await File(sourcePath).readAsBytes();
+    final decoded = img.decodeImage(bytes);
+    if (decoded == null) return sourcePath;
+
+    img.Image processed = decoded;
+    switch (_filters[_filterIndex]) {
+      case 'B&W':
+        processed = img.grayscale(decoded);
+        processed = img.contrast(processed, contrast: 160);
+        break;
+      case 'Grayscale':
+        processed = img.grayscale(decoded);
+        break;
+      case 'HD':
+        // Upscale-safe: only sharpen, never enlarge beyond source
+        // resolution (that would fabricate detail, not add real quality).
+        processed = img.convolution(decoded, filter: [0, -1, 0, -1, 5, -1, 0, -1, 0], div: 1);
+        break;
+      case 'Original':
+      case 'Auto':
+      default:
+        processed = decoded;
+    }
+
+    final dir = await FileService.workingDirectory();
+    final outPath = p.join(dir.path, 'scan_${DateTime.now().microsecondsSinceEpoch}.jpg');
+    await File(outPath).writeAsBytes(img.encodeJpg(processed, quality: 92));
+    return outPath;
+  }
+
+  final ImagePicker _picker = ImagePicker();
+
+CameraController? _cameraController;
+List<CameraDescription> _cameras = [];
+bool _cameraReady = false;
+
+double _currentZoom = 1.0;
+double _minZoom = 1.0;
+double _maxZoom = 1.0;
+
+  Future<void> _scan() async {
+    final outcome = await PermissionService.camera();
+    if (outcome != PermissionOutcome.granted) {
+      if (!mounted) return;
+      await PermissionService.handleDenied(context, outcome, featureName: 'Document scanning');
+      return;
+    }
+
+    setState(() => _scanning = true);
+    try {
+      if (_cameraController == null || !_cameraController!.value.isInitialized) {
+        throw Exception("Camera not initialized");
+      }
+      final shot = await _cameraController!.takePicture();
+      if (!await File(shot.path).exists()) {
+        if (!mounted) return;
+        setState(() => _scanning = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No page was captured.')),
+        );
+        return;
+      }
+      final processedPath = await _applyFilterAndStore(shot.path);
+      if (!mounted) return;
+      setState(() {
+        _pages.add(processedPath);
+        _scanning = false;
+      });
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      setState(() => _scanning = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Scan failed: ${e.message ?? 'unknown error'}')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _scanning = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong while scanning.')),
+      );
+    }
+  }
+
+  Future<void> _saveAsPdf() async {
+    if (_pages.isEmpty || _savingPdf) return; // Prevent double tapping / duplicate creation.
+    setState(() => _savingPdf = true);
+    try {
+      final outputPath = await runCreationFlow<String>(
+        context: context,
+        loadingTitle: 'Creating PDF…',
+        loadingSubtitle: 'Saving your scanned pages as a PDF.',
+        successTitle: 'Scan Saved as PDF',
+        task: () async {
+          final path = await PdfService.imagesToPdf(_pages, outputName: 'Scan');
+          await context.read<LibraryProvider>().registerFile(path);
+          return path;
+        },
+      );
+      if (!mounted) return;
+      setState(() {
+        _savingPdf = false;
+        _pages.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Scan saved to My Work.'),
+        action: SnackBarAction(label: 'Share', onPressed: () => FileService.shareFile(outputPath)),
+      ));
+    } on PdfOperationException catch (e) {
+      setState(() => _savingPdf = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Future<void> _saveAsImages() async {
+    if (_pages.isEmpty || _savingImages) return; // Prevent double tapping / duplicate creation.
+    setState(() => _savingImages = true);
+    final pageCount = _pages.length;
+    try {
+      await runCreationFlow<void>(
+        context: context,
+        loadingTitle: 'Saving pages…',
+        loadingSubtitle: 'Saving $pageCount scanned image${pageCount == 1 ? '' : 's'}.',
+        successTitle: 'Pages Saved Successfully',
+        task: () async {
+          final library = context.read<LibraryProvider>();
+          for (final path in _pages) {
+            await library.registerFile(path);
+          }
+        },
+      );
+      if (!mounted) return;
+      setState(() {
+        _savingImages = false;
+        _pages.clear();
+      });
+    } catch (_) {
+      setState(() => _savingImages = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong saving these pages.')),
+      );
+    }
+  }
+
+  void _openReviewSheet() {
+    AppBottomSheet.show(
+      context,
+      title: '${_pages.length} page${_pages.length == 1 ? '' : 's'} scanned',
+      children: [
+        SizedBox(
+          height: 110,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _pages.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) => Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(File(_pages[i]), width: 80, height: 110, fit: BoxFit.cover),
+                ),
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() => _pages.removeAt(i));
+                      Navigator.pop(context);
+                      if (_pages.isNotEmpty) _openReviewSheet();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                      child: const Icon(Icons.close_rounded, size: 12, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: SecondaryButton(
+                label: 'Save as Images',
+                icon: Icons.image_rounded,
+                onPressed: () {
+                  Navigator.pop(context);
+                  _saveAsImages();
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: PrimaryButton(
+                label: 'Save as PDF',
+                icon: Icons.picture_as_pdf_rounded,
+                onPressed: () {
+                  Navigator.pop(context);
+                  _saveAsPdf();
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  Future<void> _focusOnTap(TapDownDetails details, BoxConstraints constraints) async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+
+    final position = details.localPosition;
+
+    final dx = position.dx / constraints.maxWidth;
+    final dy = position.dy / constraints.maxHeight;
+
+    try {
+      await _cameraController!.setFocusPoint(Offset(dx, dy));
+      await _cameraController!.setExposurePoint(Offset(dx, dy));
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scanQuality = context.watch<SettingsProvider>().defaultScanQuality;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Ambient viewfinder chrome (native scanner owns the real camera feed)
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF1A1A22), Color(0xFF101014)],
+                  ),
+                ),
+                child: (_cameraReady && _cameraController != null)
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return GestureDetector(
+                          onTapDown: (details) => _focusOnTap(details, constraints),
+                          child: CameraPreview(_cameraController!),
+                        );
+                      },
+                    )
+                  : const Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.82,
+                heightFactor: 0.62,
+                child: Stack(
+                  children: [
+                    Positioned.fill(child: CustomPaint(painter: _EdgeFramePainter())),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: AnimatedBuilder(
+                        animation: _scanController,
+                        builder: (context, child) {
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              final top = constraints.maxHeight * _scanController.value;
+                              return Stack(
+                                children: [
+                                  Positioned(
+                                    top: top,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 3,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            AppColors.accentCoral.withOpacity(0),
+                                            AppColors.accentCoral,
+                                            AppColors.accentCoral.withOpacity(0),
+                                          ],
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.accentCoral.withOpacity(0.7),
+                                            blurRadius: 8,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleIconButton(
+                    icon: Icons.close_rounded,
+                    background: Colors.white.withOpacity(0.12),
+                    iconColor: Colors.white,
+                    onPressed: () => Navigator.maybePop(context),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text('Tap the shutter to scan · $scanQuality', style: AppTextStyles.caption(Colors.white)),
+                  ),
+                  CircleIconButton(
+                    icon: _flashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                    background: Colors.white.withOpacity(0.12),
+                    iconColor: Colors.white,
+                    onPressed: () async {
+                      if (_cameraController == null) return;
+                      final newFlash = !_flashOn;
+                      await _cameraController!.setFlashMode(newFlash ? FlashMode.torch : FlashMode.off);
+                      if (mounted) {
+                        setState(() => _flashOn = newFlash);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.75)],
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 34,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _filters.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, i) {
+                          final selected = i == _filterIndex;
+                          return GestureDetector(
+                            onTap: () => setState(() => _filterIndex = i),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: selected ? Colors.white : Colors.white.withOpacity(0.14),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                _filters[i],
+                                style: AppTextStyles.label(selected ? Colors.black : Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _thumbStack(),
+                        GestureDetector(
+                          onTap: _scanning ? null : _scan,
+                          child: Container(
+                            width: 76,
+                            height: 76,
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                            ),
+                            child: _scanning
+                                ? const Padding(
+                                    padding: EdgeInsets.all(18),
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                                  )
+                                : Container(
+                                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                                  ),
+                          ),
+                        ),
+                        CircleIconButton(
+                          icon: Icons.cameraswitch_rounded,
+                          background: Colors.white.withOpacity(0.12),
+                          iconColor: Colors.white,
+                          onPressed: null, // camera facing is controlled by the native scanner UI
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _thumbStack() {
+    return GestureDetector(
+      onTap: _pages.isEmpty ? null : _openReviewSheet,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.12),
+              border: Border.all(color: Colors.white.withOpacity(0.4)),
+            ),
+            child: _pages.isEmpty
+                ? const Icon(Icons.photo_library_rounded, color: Colors.white, size: 20)
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(11),
+                    child: Image.file(File(_pages.last), fit: BoxFit.cover),
+                  ),
+          ),
+          if (_pages.isNotEmpty)
+            Positioned(
+              top: -6,
+              right: -6,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                decoration: const BoxDecoration(color: AppColors.accentCoral, shape: BoxShape.circle),
+                child: Center(
+                  child: Text('${_pages.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EdgeFramePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.accentCoral
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    final rrect = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(16));
+    canvas.drawRRect(rrect, paint);
+
+    final cornerPaint = Paint()
+      ..color = AppColors.accentCoral
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+    const double len = 22;
+    final corners = [
+      [Offset(0, len), Offset.zero, Offset(len, 0)],
+      [Offset(size.width - len, 0), Offset(size.width, 0), Offset(size.width, len)],
+      [Offset(0, size.height - len), Offset(0, size.height), Offset(len, size.height)],
+      [
+        Offset(size.width - len, size.height),
+        Offset(size.width, size.height),
+        Offset(size.width, size.height - len),
+      ],
+    ];
+    for (final c in corners) {
+      canvas.drawPoints(PointMode.polygon, c, cornerPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}

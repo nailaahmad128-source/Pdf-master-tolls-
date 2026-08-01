@@ -1,0 +1,30 @@
+workflows:
+  android-debug:
+    name: Android Debug Build
+
+    environment:
+      flutter: stable
+
+    scripts:
+      # gradle-wrapper.jar is intentionally not committed to the repo.
+      # Regenerate it before the first `./gradlew` invocation, otherwise
+      # every `flutter build` call fails immediately with
+      # "Error: Could not find or load main class org.gradle.wrapper.GradleWrapperMain".
+      - flutter pub get
+      - flutter build apk --release
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+  android-release:
+    name: Android Release Build (App Bundle)
+
+    environment:
+      flutter: stable
+
+    scripts:
+      - flutter pub get
+      - flutter build appbundle --release
+
+    artifacts:
+      - build/app/outputs/bundle/release/*.aab

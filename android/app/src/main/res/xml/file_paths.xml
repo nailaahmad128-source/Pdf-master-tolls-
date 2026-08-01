@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- App-private sandbox dirs used by path_provider -->
+    <files-path name="app_files" path="." />
+    <cache-path name="app_cache" path="." />
+    <external-files-path name="external_files" path="." />
+    <external-cache-path name="external_cache" path="." />
+
+    <!-- Subfolders used by the app's own file/pdf/scanner services for
+         exported and generated documents (merged/split PDFs, scans,
+         OCR text exports). Keep these names in sync with
+         lib/services/file_service.dart. -->
+    <files-path name="documents" path="documents/" />
+    <files-path name="scans" path="scans/" />
+    <files-path name="ocr_exports" path="ocr_exports/" />
+    <cache-path name="pdf_cache" path="pdf/" />
+    <cache-path name="image_cache" path="images/" />
+
+    <!-- Shared/public downloads folder, when the user chooses to save
+         there via file_picker's save dialog. -->
+    <external-path name="external_storage_root" path="." />
+</paths>

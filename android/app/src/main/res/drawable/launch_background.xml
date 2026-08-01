@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Matches the indigo used by splash_screen.dart's gradient (see
+     values/colors.xml and values-night/colors.xml) so the native splash
+     hands off to the Dart splash_screen.dart with no visible color flash. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/launch_background_color" />
+</layer-list>

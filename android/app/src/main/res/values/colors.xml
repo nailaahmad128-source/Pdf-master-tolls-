@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches the top-left stop of splash_screen.dart's indigo gradient
+         (Color(0xFF3730A3) -> Color(0xFF6D5BF5)), which is shown
+         regardless of system light/dark mode. A flat color can't
+         reproduce the gradient, but this stop is the closest solid match
+         so the handoff from native splash to the Dart splash screen has
+         no visible color jump. -->
+    <color name="launch_background_color">#3730A3</color>
+</resources>

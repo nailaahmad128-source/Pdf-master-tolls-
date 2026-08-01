@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="documents/" />
+        <exclude domain="file" path="scans/" />
+        <exclude domain="file" path="ocr_exports/" />
+        <exclude domain="cache" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="cache" path="." />
+    </device-transfer>
+</data-extraction-rules>

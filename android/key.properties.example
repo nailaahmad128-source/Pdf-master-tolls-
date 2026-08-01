@@ -1,0 +1,16 @@
+# Copy to `key.properties` in this same android/ folder and fill in real
+# values before building a release for the Play Store. Generate the
+# upload keystore first with:
+#
+#   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA \
+#     -keysize 2048 -validity 10000 -alias upload
+#
+# Keep upload-keystore.jks and this file OUT of version control --
+# both are covered by android/.gitignore already. Losing the keystore
+# means you can never update the app under the same Play listing again,
+# so back it up somewhere safe (password manager / offline vault).
+
+storePassword=REPLACE_ME
+keyPassword=REPLACE_ME
+keyAlias=upload
+storeFile=/absolute/path/to/upload-keystore.jks
