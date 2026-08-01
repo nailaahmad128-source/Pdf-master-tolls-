@@ -352,33 +352,7 @@ class _FillSignScreenState extends State<FillSignScreen> {
     });
   }
 
-  void _copyOverlay(int index) {
-  setState(() {
-    final o=_overlays[index];
-    if(o.kind==_OverlayKind.signature){
-      _overlays.add(
-        _Overlay.signature(
-          o.pngBytes,
-          x:(o.x+0.03).clamp(0.0,0.95),
-          y:(o.y+0.03).clamp(0.0,0.95),
-          width:o.width,
-          height:o.height,
-        ),
-      );
-    }else{
-      _overlays.add(
-        _Overlay.text(
-          o.text,
-          x:(o.x+0.03).clamp(0.0,0.95),
-          y:(o.y+0.03).clamp(0.0,0.95),
-          fontSize:o.fontSize,
-        ),
-      );
-    }
-  });
-}
-
-void _removeOverlay(int index) {
+  void _removeOverlay(int index) {
     setState(() => _overlays.removeAt(index));
   }
 
@@ -624,26 +598,6 @@ class _PagePreview extends StatelessWidget {
                                 // pad's own controls).
                                 Positioned(
                                   top: -12,
-                                  left: -12,
-                                  child: GestureDetector(
-                                    onTap: () => _copyOverlay(i),
-                                    child: Container(
-                                      width: 22,
-                                      height: 22,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.blue,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.copy_rounded,
-                                        size: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: -12,
                                   right: -12,
                                   child: GestureDetector(
                                     onTap: () => onOverlayRemoved(i),
@@ -655,85 +609,10 @@ class _PagePreview extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  top: -12,
-                                  left: -12,
-                                  child: GestureDetector(
-                                    onPanUpdate: (details) => onOverlayResized(
-                                      i,
-                                      -details.delta.dx / box.maxWidth,
-                                      -details.delta.dy / box.maxHeight,
-                                    ),
-                                    child: Container(
-                                      width: 22,
-                                      height: 22,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.brandIndigo,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.open_in_full_rounded,
-                                        size: 12,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-Positioned(
-                                  bottom: -12,
-                                  left: -12,
-                                  child: GestureDetector(
-                                    onPanUpdate: (details) => onOverlayResized(
-                                      i,
-                                      -details.delta.dx / box.maxWidth,
-                                      details.delta.dy / box.maxHeight,
-                                    ),
-                                    child: Container(
-                                      width: 22,
-                                      height: 22,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.brandIndigo,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.open_in_full_rounded,
-                                        size: 12,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
                                 // Drag handle to resize this overlay in
                                 // place, separate from the move gesture
                                 // on the body of the overlay above.
                                 Positioned(
-                                  top: -12,
-                                  right: -12,
-                                  child: GestureDetector(
-                                    onPanUpdate: (details) => onOverlayResized(
-                                      i,
-                                      details.delta.dx / box.maxWidth,
-                                      -details.delta.dy / box.maxHeight,
-                                    ),
-                                    child: Container(
-                                      width: 22,
-                                      height: 22,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.brandIndigo,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.open_in_full_rounded,
-                                        size: 12,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-Positioned(
                                   bottom: -12,
                                   right: -12,
                                   child: GestureDetector(
