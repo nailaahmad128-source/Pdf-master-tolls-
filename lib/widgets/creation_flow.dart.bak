@@ -314,31 +314,7 @@ class FileHistoryCard extends StatelessWidget {
     }
   }
 
-  
-  Future<void> _saveToFiles(BuildContext context) async {
-    final paths=_paths.where((e)=>File(e).existsSync()).toList();
-    if(paths.isEmpty) return;
-
-    final base=Directory("/storage/emulated/0/PDF Master Tools/Saved Files");
-    if(!await base.exists()){
-      await base.create(recursive:true);
-    }
-
-    final src=File(paths.first);
-    final dst=File("${base.path}/${src.uri.pathSegments.last}");
-
-    await src.copy(dst.path);
-
-    if(context.mounted){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("✅ Successfully saved to files"),
-        ),
-      );
-    }
-  }
-
-Future<void> _share(BuildContext context) async {
+  Future<void> _share(BuildContext context) async {
     final paths = _paths.where((p) => File(p).existsSync()).toList();
     if (paths.isEmpty) {
       if (context.mounted) {
@@ -561,13 +537,6 @@ Future<void> _share(BuildContext context) async {
                       onPressed: () => _open(context),
                       icon: const Icon(Icons.visibility_outlined, size: 16),
                       label: const Text('Open'),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed: () => _saveToFiles(context),
-                      icon: const Icon(Icons.save_alt_rounded, size: 16),
-                      label: const Text('Save'),
                     ),
                   ),
                   Expanded(
