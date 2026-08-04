@@ -35,7 +35,7 @@ if (hasReleaseKeystore) {
 }
 
 android {
-    namespace "com.pdfmastertools.app"
+    namespace "com.hameed.pdfmastertools"
     compileSdk 36
     ndkVersion flutter.ndkVersion
 
@@ -56,7 +56,7 @@ android {
     defaultConfig {
         // Play Store application id -- change ONLY before first publish,
         // it cannot be changed after the app is live.
-        applicationId "com.pdfmastertools.app"
+        applicationId "com.hameed.pdfmastertools"
         minSdkVersion 23
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
