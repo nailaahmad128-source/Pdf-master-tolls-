@@ -86,7 +86,7 @@ class _MyWorkScreenState extends State<MyWorkScreen> with SingleTickerProviderSt
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final files = List<LibraryFile>.from(context.read<LibraryProvider>().library);
+    final files = List<LibraryFile>.from(context.read<LibraryProvider>().recents);
     final trash = await FileService.listTrashFiles();
     final storage = await FileService.storageSummary();
     if (!mounted) return;
