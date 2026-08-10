@@ -41,11 +41,11 @@ jobs:
           storeFile=upload-keystore.jks
           EOF
 
-      - name: Build App Bundle
-        run: flutter build appbundle --release
+      - name: Build APK
+        run: flutter build apk --release
 
-      - name: Upload AAB
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
