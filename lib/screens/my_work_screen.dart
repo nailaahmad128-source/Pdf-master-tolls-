@@ -433,8 +433,14 @@ class _MyWorkScreenState extends State<MyWorkScreen> with SingleTickerProviderSt
                 confirmLabel: 'Delete',
                 destructive: true,
                 onConfirm: () async {
-                  await FileService.moveToTrash(file.path);
-                  await library.refresh();
+                  // Goes through LibraryProvider (not FileService.moveToTrash
+                  // directly) so the Recent/Favorite bucket entries pointing
+                  // at this file are removed too. Without this, the file
+                  // physically moves to trash but this screen's "All Files"
+                  // tab -- which is sourced from LibraryProvider.recents --
+                  // keeps showing it until a second deletion happens to
+                  // clear the stale entry.
+                  await library.deleteFile(file.path);
                   await _load();
                 },
               ),
@@ -505,6 +511,7 @@ class _MyWorkScreenState extends State<MyWorkScreen> with SingleTickerProviderSt
   }
 
   void _showTrashActions(BuildContext context, LibraryFile file) {
+    final library = context.read<LibraryProvider>();
     AppBottomSheet.show(
       context,
       title: file.name,
@@ -515,10 +522,12 @@ class _MyWorkScreenState extends State<MyWorkScreen> with SingleTickerProviderSt
           onTap: () async {
             Navigator.pop(context);
             if (file.originalPath != null) {
-              await FileService.restoreFromTrash(
-                file.path,
-                file.originalPath!,
-              );
+              // Goes through LibraryProvider (not FileService.restoreFromTrash
+              // directly) so the restored file is re-registered as a recent
+              // entry -- otherwise it moves back out of Trash on disk but
+              // never reappears in the "All Files" tab, which is sourced
+              // from LibraryProvider.recents.
+              await library.restoreFile(file.path, file.originalPath!);
               await _load();
             }
           },

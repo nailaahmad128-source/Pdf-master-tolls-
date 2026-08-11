@@ -1,4 +1,4 @@
-package com.hameed.pdfmastertools
+package com.pdfmastertools.app
 
 import io.flutter.embedding.android.FlutterActivity
 

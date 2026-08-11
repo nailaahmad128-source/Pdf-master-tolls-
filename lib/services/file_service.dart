@@ -280,12 +280,16 @@ class FileService {
   }
 
 
-  static Future<void> restoreFromTrash(
+  /// Restores a trashed file to (near) its original location and returns
+  /// the path it actually ended up at, which the caller needs so it can
+  /// re-register the file with [LibraryProvider] (see
+  /// `LibraryProvider.restoreFile`).
+  static Future<String?> restoreFromTrash(
     String trashPath,
     String originalPath,
   ) async {
     final file = File(trashPath);
-    if (!await file.exists()) return;
+    if (!await file.exists()) return null;
 
     // If something new already occupies the original path, restore
     // alongside it instead of silently overwriting that other file.
@@ -312,6 +316,8 @@ class FileService {
       StoreKeys.trashFiles,
       trashPath,
     );
+
+    return restorePath;
   }
 
 

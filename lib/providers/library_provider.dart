@@ -134,6 +134,18 @@ class LibraryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Restores a file from Recently Deleted/Trash and re-registers it as a
+  /// recent entry so it becomes visible in My Work again immediately,
+  /// mirroring the entry removal [deleteFile] does when the file is first
+  /// deleted. Returns the path the file was restored to, or null if the
+  /// trashed file no longer exists on disk.
+  Future<String?> restoreFile(String trashPath, String originalPath) async {
+    final restoredPath = await FileService.restoreFromTrash(trashPath, originalPath);
+    if (restoredPath == null) return null;
+    await registerFile(restoredPath);
+    return restoredPath;
+  }
+
   /// Clears every Recent/Favorite entry without touching any file on
   /// disk. Call this after a bulk file-system wipe (e.g. Settings ->
   /// Clear cache) so lists don't keep showing entries that now point at

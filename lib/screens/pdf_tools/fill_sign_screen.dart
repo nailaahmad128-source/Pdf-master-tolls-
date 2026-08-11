@@ -502,6 +502,12 @@ void _removeOverlay(int index) {
                         : Padding(
                             padding: const EdgeInsets.all(16),
                             child: _PagePreview(
+                              // Recreates the zoom/pan viewer (and resets it
+                              // to its default 1x scale) whenever the page
+                              // OR the selected PDF changes, instead of
+                              // carrying the previous page's zoom/pan state
+                              // over onto a different page or document.
+                              key: ValueKey('$_path-$_pageIndex'),
                               pageBytes: _pagePng!,
                               aspectRatio: _pageAspectRatio,
                               overlays: _overlays,
@@ -550,7 +556,7 @@ void _removeOverlay(int index) {
   }
 }
 
-class _PagePreview extends StatelessWidget {
+class _PagePreview extends StatefulWidget {
   final Uint8List pageBytes;
   final double aspectRatio;
   final List<_Overlay> overlays;
@@ -560,6 +566,7 @@ class _PagePreview extends StatelessWidget {
   final void Function(int index) onOverlayCopied;
 
   const _PagePreview({
+    super.key,
     required this.pageBytes,
     required this.aspectRatio,
     required this.overlays,
@@ -570,8 +577,39 @@ class _PagePreview extends StatelessWidget {
   });
 
   @override
+  State<_PagePreview> createState() => _PagePreviewState();
+}
+
+class _PagePreviewState extends State<_PagePreview> {
+  final TransformationController _transformController = TransformationController();
+
+  // True while the user has a finger down on an overlay (moving or
+  // resizing it). While true, the InteractiveViewer's own pan/scale
+  // handling is switched off so a one-finger drag on a signature/text
+  // overlay can never be stolen by the page's pinch-zoom/pan gesture --
+  // it only ever reaches the overlay's own GestureDetector.
+  bool _overlayGestureActive = false;
+
+  void _setOverlayGestureActive(bool active) {
+    if (_overlayGestureActive == active) return;
+    setState(() => _overlayGestureActive = active);
+  }
+
+  @override
+  void dispose() {
+    _transformController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final overlays = widget.overlays;
+    final onOverlayMoved = widget.onOverlayMoved;
+    final onOverlayResized = widget.onOverlayResized;
+    final onOverlayRemoved = widget.onOverlayRemoved;
+    final onOverlayCopied = widget.onOverlayCopied;
+    final pageBytes = widget.pageBytes;
     return Center(
       child: AspectRatio(
         // Sizing the box to the page's own aspect ratio (rather than
@@ -579,7 +617,7 @@ class _PagePreview extends StatelessWidget {
         // rendered image edge-to-edge with this widget's bounds, so a
         // drag delta expressed as a fraction of this box's size maps
         // 1:1 onto the PDF page -- no letterboxing gap to account for.
-        aspectRatio: aspectRatio,
+        aspectRatio: widget.aspectRatio,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: theme.colorScheme.outlineVariant),
@@ -587,12 +625,22 @@ class _PagePreview extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: LayoutBuilder(
-              builder: (context, box) {
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned.fill(child: Image.memory(pageBytes, fit: BoxFit.fill)),
+            child: InteractiveViewer(
+              transformationController: _transformController,
+              minScale: 1,
+              maxScale: 5,
+              // Real two-finger pinch: InteractiveViewer's built-in scale
+              // gesture zooms around the pinch focal point automatically.
+              // Disabled while an overlay drag is active (see above) so it
+              // never competes with signature/text dragging or resizing.
+              panEnabled: !_overlayGestureActive,
+              scaleEnabled: !_overlayGestureActive,
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned.fill(child: Image.memory(pageBytes, fit: BoxFit.fill)),
                     ...List.generate(overlays.length, (i) {
                       final o = overlays[i];
                       final boxWidth = o.kind == _OverlayKind.signature ? o.width * box.maxWidth : null;
@@ -601,11 +649,14 @@ class _PagePreview extends StatelessWidget {
                         left: o.x * box.maxWidth,
                         top: o.y * box.maxHeight,
                         child: GestureDetector(
+                          onPanStart: (_) => _setOverlayGestureActive(true),
                           onPanUpdate: (details) => onOverlayMoved(
                             i,
                             details.delta.dx / box.maxWidth,
                             details.delta.dy / box.maxHeight,
                           ),
+                          onPanEnd: (_) => _setOverlayGestureActive(false),
+                          onPanCancel: () => _setOverlayGestureActive(false),
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
@@ -662,11 +713,14 @@ class _PagePreview extends StatelessWidget {
                                   top: -12,
                                   left: -12,
                                   child: GestureDetector(
+                                    onPanStart: (_) => _setOverlayGestureActive(true),
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       -details.delta.dx / box.maxWidth,
                                       -details.delta.dy / box.maxHeight,
                                     ),
+                                    onPanEnd: (_) => _setOverlayGestureActive(false),
+                                    onPanCancel: () => _setOverlayGestureActive(false),
                                     child: Container(
                                       width: 12,
                                       height: 12,
@@ -687,11 +741,14 @@ Positioned(
                                   bottom: -12,
                                   left: -12,
                                   child: GestureDetector(
+                                    onPanStart: (_) => _setOverlayGestureActive(true),
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       -details.delta.dx / box.maxWidth,
                                       details.delta.dy / box.maxHeight,
                                     ),
+                                    onPanEnd: (_) => _setOverlayGestureActive(false),
+                                    onPanCancel: () => _setOverlayGestureActive(false),
                                     child: Container(
                                       width: 12,
                                       height: 12,
@@ -715,11 +772,14 @@ Positioned(
                                   top: -12,
                                   right: -12,
                                   child: GestureDetector(
+                                    onPanStart: (_) => _setOverlayGestureActive(true),
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       details.delta.dx / box.maxWidth,
                                       -details.delta.dy / box.maxHeight,
                                     ),
+                                    onPanEnd: (_) => _setOverlayGestureActive(false),
+                                    onPanCancel: () => _setOverlayGestureActive(false),
                                     child: Container(
                                       width: 12,
                                       height: 12,
@@ -740,11 +800,14 @@ Positioned(
                                   bottom: -12,
                                   right: -12,
                                   child: GestureDetector(
+                                    onPanStart: (_) => _setOverlayGestureActive(true),
                                     onPanUpdate: (details) => onOverlayResized(
                                       i,
                                       details.delta.dx / box.maxWidth,
                                       details.delta.dy / box.maxHeight,
                                     ),
+                                    onPanEnd: (_) => _setOverlayGestureActive(false),
+                                    onPanCancel: () => _setOverlayGestureActive(false),
                                     child: Container(
                                       width: 12,
                                       height: 12,
@@ -759,9 +822,10 @@ Positioned(
                         ),
                       );
                     }),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
