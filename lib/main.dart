@@ -1,76 +1,77 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 
-import 'core/storage/local_store.dart';
-import 'providers/library_provider.dart';
-import 'providers/settings_provider.dart';
-import 'screens/splash_screen.dart';
-import 'services/ads_service.dart';
-import 'theme/app_theme.dart';
+import 'core/storage/hive_boxes.dart';
+import 'core/storage/app_data_controller.dart';
+import 'core/services/file_storage_service.dart';
+import 'core/services/pdf_tools_service.dart';
+import 'core/services/ads_service.dart';
+import 'core/constants/app_config.dart';
+import 'core/theme/app_theme.dart';
+import 'app_shell.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
-  // Local persistence must be ready before the first frame reads
-  // settings/recents/favorites synchronously during build.
-  await LocalStore.instance.init();
+  // Registers the Syncfusion license used by the PDF engine (merge/split/
+  // rotate/security/fill) and the PDF reader viewer. Without a valid key
+  // Syncfusion's widgets show a trial watermark — see AppConfig and the
+  // README for how to supply a real key (Syncfusion offers a free
+  // Community License for qualifying individuals/small businesses).
+  if (AppConfig.syncfusionLicenseKey.isNotEmpty) {
+    SyncfusionLicense.registerLicense(AppConfig.syncfusionLicenseKey);
+  }
 
-  // Syncfusion Flutter PDF (used for Merge/Split/Lock/Unlock) requires a
-  // registered license key at startup -- free under Syncfusion's Community
-  // License for qualifying individuals/small businesses, or a commercial
-  // key otherwise. Without a valid key, PDF operations still run but show
-  // a trial watermark/banner. Replace the placeholder below with your own
-  // key from https://www.syncfusion.com/account/manage-trials/downloads
-  // (Community License is free to generate) before shipping to production.
-  SyncfusionLicense.registerLicense('YOUR_SYNCFUSION_LICENSE_KEY');
+  await HiveBoxes.init();
 
-  runApp(const PdfMasterToolsApp());
+  final storage = FileStorageService();
+  final dataController = AppDataController(storage);
+  await dataController.purgeExpiredTrash();
 
-  // AdMob: initialized after the first frame is already up rather than
-  // awaited before runApp, so the splash screen paints immediately
-  // instead of waiting on a network-bound SDK init (perf: startup
-  // responsiveness). preloadInterstitial/preloadRewarded still run early
-  // enough that the first ad opportunity later in the session has a
-  // cached ad ready, since real usage (scanning, PDF export) always takes
-  // longer than this init.
-  unawaited(() async {
-    await AdsService.initialize();
-    AdsService.preloadInterstitial();
-    AdsService.preloadRewarded();
-  }());
+  final adsService = AdsService();
+  // Fire-and-forget: ads must never block app startup. If the SDK fails to
+  // initialize (no network, restricted build, etc.) the app runs ad-free
+  // rather than crashing or hanging on a splash screen.
+  unawaited(adsService.init());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<FileStorageService>.value(value: storage),
+        Provider<PdfToolsService>.value(value: PdfToolsService(storage)),
+        Provider<AdsService>.value(value: adsService),
+        ChangeNotifierProvider<AppDataController>.value(value: dataController),
+      ],
+      child: const PdfMasterApp(),
+    ),
+  );
 }
 
-/// Root widget. Theme now follows the persisted [SettingsProvider] value
-/// (Dark / Light / System) instead of a hardcoded `ThemeMode.system` --
-/// this is the only behavioral change here; the theme data, colors, and
-/// navigation shell below are untouched.
-class PdfMasterToolsApp extends StatelessWidget {
-  const PdfMasterToolsApp({super.key});
+class PdfMasterApp extends StatelessWidget {
+  const PdfMasterApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => SettingsProvider()),
-        ChangeNotifierProvider(create: (_) => LibraryProvider()),
-      ],
-      child: Consumer<SettingsProvider>(
-        builder: (context, settings, _) {
-          return MaterialApp(
-            title: 'PDF Master Tools',
-
-            debugShowCheckedModeBanner: false,
-            themeMode: settings.themeMode,
-
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            home: const SplashScreen(),
-          );
-        },
-      ),
+    final data = context.watch<AppDataController>();
+    final themeMode = switch (data.themeModeIndex) {
+      1 => ThemeMode.light,
+      2 => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+    return MaterialApp(
+      title: 'PDF Master Tools',
+      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      home: const AppShell(),
     );
   }
 }

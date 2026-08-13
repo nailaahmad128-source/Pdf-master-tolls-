@@ -1,118 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Camera for QR Scanner -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- Network state, used only to decide whether to attempt loading an ad -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Legacy storage permissions for pre-Android 13 devices; scoped
+         storage / SAF (via file_picker & image_picker) is used on modern
+         Android and does not require these, but they're harmless no-ops
+         there and keep older devices working correctly. -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
-<uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-    
-    
-    
-    
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        android:minSdkVersion="33" />
 
     <application
-        android:label="@string/app_name"
+        android:label="PDF Master Tools"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:enableOnBackInvokedCallback="true"
-        android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_rules"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:requestLegacyExternalStorage="false">
+        android:enableOnBackInvokedCallback="true">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
+            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
-
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
+            <!-- Allow opening .pdf files shared from other apps directly
+                 into PDF Master Tools. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
                 <data android:mimeType="application/pdf" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/pdf" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
 
-        <!-- Required: tells the Flutter tool this app uses the v2 Android
-             embedding. Its absence causes Flutter 3.29+ (which deleted the
-             v1 embedding classes entirely) to fail every build with
-             "Build failed due to use of deleted Android v1 embedding.",
-             even though MainActivity.kt and the rest of the project are
-             already fully v2. -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- AdMob application ID. Replace ADMOB_APP_ID_PLACEHOLDER with
+             your real AdMob App ID before publishing (see README).
+             google_mobile_ads requires this meta-data to be present even
+             while using test ad units during development. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${admobAppId}" />
 
-        <meta-data
-            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
-            android:value="true" />
-        <meta-data
-            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
-            android:value="true" />
-
+        <!-- FileProvider: required for sharing files (share_plus) and for
+             letting other apps open files we produce via OpenFilex. -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.hameed.pdfmastertools.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
+    <!-- Required by package_info_plus / url_launcher to query installed
+         browser / mail apps on Android 11+ (queries element). -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
-            <data android:mimeType="application/pdf" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
         </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:mimeType="image/*" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.SEND" />
-            <data android:mimeType="*/*" />
-        </intent>
-        <package android:name="com.android.vending" />
     </queries>
-
 </manifest>
