@@ -24,7 +24,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   String _query = '';
 
   Future<void> _importFiles() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: const ['pdf'],
       allowMultiple: true,
