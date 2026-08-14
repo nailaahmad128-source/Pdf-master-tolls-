@@ -79,7 +79,7 @@ Future<List<String>> _pickFromDevice(
   required bool allowMultiple,
   required List<String> extensions,
 }) async {
-  final result = await FilePicker.pickFiles(
+  final result = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: extensions,
     allowMultiple: allowMultiple,
