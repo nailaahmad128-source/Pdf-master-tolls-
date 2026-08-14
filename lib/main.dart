@@ -26,7 +26,6 @@ Future<void> main() async {
   // README for how to supply a real key (Syncfusion offers a free
   // Community License for qualifying individuals/small businesses).
   if (AppConfig.syncfusionLicenseKey.isNotEmpty) {
-    SyncfusionLicense.registerLicense(AppConfig.syncfusionLicenseKey);
   }
 
   await HiveBoxes.init();
