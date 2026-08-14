@@ -22,9 +22,9 @@ dependencies:
   path: ^1.9.0
 
   # PDF engine: merge / split / reorder / rotate / security / fill forms
-  syncfusion_flutter_pdf: ^27.1.58
+  syncfusion_flutter_pdf: 27.2.5
   # PDF viewer for the reader screen
-  syncfusion_flutter_pdfviewer: ^27.1.58
+  syncfusion_flutter_pdfviewer: 27.2.5
   # Explicit dependency (not just transitive) since main.dart calls
   # SyncfusionLicense.registerLicense() directly — see AppConfig.
   syncfusion_flutter_core: ^27.1.58
