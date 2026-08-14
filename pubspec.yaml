@@ -38,7 +38,7 @@ dependencies:
 
   # File selection / IO
   file_picker: 10.3.10
-  share_plus: ^10.1.2
+  share_plus: ^13.3.0
   open_filex: ^4.5.0
 
   # Signature capture for Fill & Sign
