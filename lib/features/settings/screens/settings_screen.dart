@@ -37,27 +37,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             _SectionLabel('Appearance'),
             Card(
-              child: Column(
-                children: [
-                  RadioListTile<int>(
-                    title: const Text('System default'),
-                    value: 0,
-                    groupValue: data.themeModeIndex,
-                    onChanged: (v) => data.setThemeModeIndex(v!),
-                  ),
-                  RadioListTile<int>(
-                    title: const Text('Light'),
-                    value: 1,
-                    groupValue: data.themeModeIndex,
-                    onChanged: (v) => data.setThemeModeIndex(v!),
-                  ),
-                  RadioListTile<int>(
-                    title: const Text('Dark'),
-                    value: 2,
-                    groupValue: data.themeModeIndex,
-                    onChanged: (v) => data.setThemeModeIndex(v!),
-                  ),
-                ],
+              child: RadioGroup<int>(
+                groupValue: data.themeModeIndex,
+                onChanged: (v) => data.setThemeModeIndex(v!),
+                child: Column(
+                  children: [
+                    RadioListTile<int>(
+                      title: const Text('System default'),
+                      value: 0,
+                    ),
+                    RadioListTile<int>(
+                      title: const Text('Light'),
+                      value: 1,
+                    ),
+                    RadioListTile<int>(
+                      title: const Text('Dark'),
+                      value: 2,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),

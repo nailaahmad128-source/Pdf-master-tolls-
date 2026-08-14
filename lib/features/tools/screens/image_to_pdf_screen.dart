@@ -67,14 +67,6 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen> {
     }
   }
 
-  void _reorder(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) newIndex--;
-      final item = _images.removeAt(oldIndex);
-      _images.insert(newIndex, item);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

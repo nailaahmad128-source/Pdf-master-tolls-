@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' show Offset, Rect;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -74,7 +75,6 @@ class PdfToolsService {
       for (int i = 0; i < src.pages.count; i++) {
         final template = src.pages[i].createTemplate();
         final page = merged.pages.add();
-        page.size; // no-op access to keep analyzer quiet about unused import path
         page.graphics.drawPdfTemplate(template, const Offset(0, 0), src.pages[i].size);
       }
       src.dispose();
@@ -252,7 +252,7 @@ class PdfToolsService {
       final image = pw.MemoryImage(jpg);
       pdfDoc.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat(page.width, page.height),
+          pageFormat: PdfPageFormat(page.width.toDouble(), page.height.toDouble()),
           build: (context) => pw.Image(image, fit: pw.BoxFit.fill),
         ),
       );
@@ -365,17 +365,15 @@ class PdfToolsService {
     final doc = PdfDocument(inputBytes: await File(path).readAsBytes());
     final result = <PdfFormFieldInfo>[];
     final form = doc.form;
-    if (form != null) {
-      for (int i = 0; i < form.fields.count; i++) {
-        final field = form.fields[i];
-        result.add(PdfFormFieldInfo(
-          name: field.name ?? 'field_$i',
-          pageIndex: field.page != null ? doc.pages.indexOf(field.page!) : 0,
-          bounds: field.bounds,
-          isText: field is PdfTextBoxField,
-          isCheckbox: field is PdfCheckBoxField,
-        ));
-      }
+    for (int i = 0; i < form.fields.count; i++) {
+      final field = form.fields[i];
+      result.add(PdfFormFieldInfo(
+        name: field.name ?? 'field_$i',
+        pageIndex: field.page != null ? doc.pages.indexOf(field.page!) : 0,
+        bounds: field.bounds,
+        isText: field is PdfTextBoxField,
+        isCheckbox: field is PdfCheckBoxField,
+      ));
     }
     doc.dispose();
     return result;
@@ -391,17 +389,15 @@ class PdfToolsService {
   }) async {
     final doc = PdfDocument(inputBytes: await File(path).readAsBytes());
     final form = doc.form;
-    if (form != null) {
-      for (int i = 0; i < form.fields.count; i++) {
-        final field = form.fields[i];
-        if (field is PdfTextBoxField && textValues.containsKey(field.name)) {
-          field.text = textValues[field.name]!;
-        } else if (field is PdfCheckBoxField && checkValues.containsKey(field.name)) {
-          field.isChecked = checkValues[field.name]!;
-        }
+    for (int i = 0; i < form.fields.count; i++) {
+      final field = form.fields[i];
+      if (field is PdfTextBoxField && textValues.containsKey(field.name)) {
+        field.text = textValues[field.name]!;
+      } else if (field is PdfCheckBoxField && checkValues.containsKey(field.name)) {
+        field.isChecked = checkValues[field.name]!;
       }
-      form.fields.flattenAllFields();
     }
+    form.flattenAllFields();
     final bytes = await doc.save();
     doc.dispose();
     final file = await storage.newTmpFile(outputName);
