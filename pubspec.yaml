@@ -61,7 +61,7 @@ dependencies:
   collection: ^1.19.0
 
   # App version info for Settings
-  package_info_plus: ^8.1.2
+  package_info_plus: ^10.2.1
 
   # Ads
   google_mobile_ads: ^9.0.0
