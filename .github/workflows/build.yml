@@ -93,7 +93,8 @@ jobs:
           EOF
             echo "Release signing configured."
           else
-            echo "No KEYSTORE_BASE64 secret set — release build will be signed with the debug key instead. Add the secret before publishing to Google Play."
+            echo "ERROR: KEYSTORE_BASE64 secret is missing. Cannot create a release-signed AAB."
+            exit 1
           fi
 
       - name: Build release APK
