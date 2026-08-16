@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../models/document_item.dart';
 import '../utils/format_utils.dart';
@@ -22,62 +21,97 @@ class DocumentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Slidable(
-      key: ValueKey(doc.id),
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        extentRatio: 0.6,
-        children: [
-          SlidableAction(
-            onPressed: (_) => Share.shareXFiles([XFile(doc.filePath)]),
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: Colors.white,
-            icon: Icons.ios_share_rounded,
-            label: 'Share',
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
-          ),
-          SlidableAction(
-            onPressed: (_) => onToggleFavorite(),
-            backgroundColor: Colors.amber.shade600,
-            foregroundColor: Colors.white,
-            icon: doc.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
-            label: 'Favorite',
-          ),
-          SlidableAction(
-            onPressed: (_) => onDelete(),
-            backgroundColor: theme.colorScheme.error,
-            foregroundColor: Colors.white,
-            icon: Icons.delete_outline_rounded,
-            label: 'Delete',
-            borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
-          ),
-        ],
-      ),
-      child: Card(
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          onTap: onTap,
-          leading: _Thumb(doc: doc),
-          title: Text(
-            doc.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall,
-          ),
-          subtitle: Text(
-            [
-              formatBytes(doc.sizeBytes),
-              if (doc.pageCount != null) '${doc.pageCount} pages',
-              formatRelativeDate(doc.modifiedAt),
-            ].join(' · '),
-            style: theme.textTheme.bodySmall,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: doc.isFavorite
-              ? const Icon(Icons.star_rounded, color: Colors.amber, size: 20)
-              : null,
+
+    return Card(
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 6,
         ),
+        onTap: onTap,
+
+        leading: _Thumb(doc: doc),
+
+        title: Text(
+          doc.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleSmall,
+        ),
+
+        subtitle: Text(
+          [
+            formatBytes(doc.sizeBytes),
+            if (doc.pageCount != null) '${doc.pageCount} pages',
+            formatRelativeDate(doc.modifiedAt),
+          ].join(' · '),
+          style: theme.textTheme.bodySmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        trailing: PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert_rounded),
+          tooltip: 'More options',
+
+          onSelected: (value) async {
+            switch (value) {
+              case 'share':
+                await Share.shareXFiles([
+                  XFile(doc.filePath),
+                ]);
+                break;
+
+              case 'favorite':
+                onToggleFavorite();
+                break;
+
+              case 'delete':
+                onDelete();
+                break;
+            }
+          },
+
+          itemBuilder: (context) => [
+            const PopupMenuItem<String>(
+              value: 'share',
+              child: ListTile(
+                leading: Icon(Icons.ios_share_rounded),
+                title: Text('Share'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+
+            PopupMenuItem<String>(
+              value: 'favorite',
+              child: ListTile(
+                leading: Icon(
+                  Icons.star_rounded,
+                  color: Colors.amber,
+                ),
+                title: Text('Favorite'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+
+            const PopupMenuDivider(),
+
+            const PopupMenuItem<String>(
+              value: 'delete',
+              child: ListTile(
+                leading: Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red,
+                ),
+                title: Text('Delete'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        ),
+
+        // Favorite ہونے پر چھوٹا star نام کے ساتھ نہیں،
+        // صرف تین ڈاٹس میں Favorite action موجود ہوگا۔
       ),
     );
   }
@@ -85,13 +119,16 @@ class DocumentTile extends StatelessWidget {
 
 class _Thumb extends StatelessWidget {
   final DocumentItem doc;
+
   const _Thumb({required this.doc});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(12);
-    if (doc.thumbnailPath != null && File(doc.thumbnailPath!).existsSync()) {
+
+    if (doc.thumbnailPath != null &&
+        File(doc.thumbnailPath!).existsSync()) {
       return ClipRRect(
         borderRadius: radius,
         child: Image.file(
@@ -102,6 +139,7 @@ class _Thumb extends StatelessWidget {
         ),
       );
     }
+
     return Container(
       width: 44,
       height: 52,
@@ -110,7 +148,9 @@ class _Thumb extends StatelessWidget {
         borderRadius: radius,
       ),
       child: Icon(
-        doc.type == 'image' ? Icons.image_rounded : Icons.picture_as_pdf_rounded,
+        doc.type == 'image'
+            ? Icons.image_rounded
+            : Icons.picture_as_pdf_rounded,
         color: theme.colorScheme.primary,
         size: 22,
       ),
