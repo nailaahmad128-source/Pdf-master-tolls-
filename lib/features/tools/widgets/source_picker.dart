@@ -87,7 +87,7 @@ Future<List<String>> _pickFromDevice(
   if (result == null) return [];
   final storage = context.read<FileStorageService>();
   final paths = <String>[];
-  for (final f in result.files) {
+  for (final f in result) {
     if (f.path == null) continue;
     final copied = await storage.importIntoLibrary(File(f.path!), preferredName: f.name);
     paths.add(copied);
