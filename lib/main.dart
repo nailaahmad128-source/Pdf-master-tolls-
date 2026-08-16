@@ -32,7 +32,7 @@ Future<void> main() async {
 
   final storage = FileStorageService();
   final dataController = AppDataController(storage);
-  await dataController.purgeExpiredTrash();
+// TEMP_DISABLED:   await dataController.purgeExpiredTrash();
 
   final adsService = AdsService();
   // Fire-and-forget: ads must never block app startup. If the SDK fails to
