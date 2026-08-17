@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+
+import 'core/storage/hive_boxes.dart';
+import 'core/storage/app_data_controller.dart';
+import 'core/services/file_storage_service.dart';
+import 'core/theme/app_theme.dart';
 import 'app_shell.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const PdfMasterApp());
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  await HiveBoxes.init();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AppDataController(FileStorageService()),
+      child: const PdfMasterApp(),
+    ),
+  );
 }
 
 class PdfMasterApp extends StatelessWidget {
@@ -14,8 +34,8 @@ class PdfMasterApp extends StatelessWidget {
     return MaterialApp(
       title: 'PDF Master Tools',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       home: const AppShell(),
     );
   }
