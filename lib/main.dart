@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_core/core.dart';
 
 import 'core/storage/hive_boxes.dart';
 import 'core/storage/app_data_controller.dart';
 import 'core/services/file_storage_service.dart';
 import 'core/services/pdf_tools_service.dart';
 import 'core/services/ads_service.dart';
-import 'core/constants/app_config.dart';
 import 'core/theme/app_theme.dart';
 import 'app_shell.dart';
 
@@ -22,10 +20,6 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  if (AppConfig.syncfusionLicenseKey.isNotEmpty) {
-    SyncfusionLicense.registerLicense(
-      AppConfig.syncfusionLicenseKey,
-    );
   }
 
   // IMPORTANT:
