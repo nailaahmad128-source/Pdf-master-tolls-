@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'core/storage/hive_boxes.dart';
 import 'core/storage/app_data_controller.dart';
 import 'core/services/file_storage_service.dart';
+import 'core/services/ads_service.dart';
 import 'core/theme/app_theme.dart';
 import 'app_shell.dart';
 
@@ -18,9 +19,21 @@ Future<void> main() async {
 
   await HiveBoxes.init();
 
+  final storage = FileStorageService();
+  final adsService = AdsService();
+
+  // Ads must never block app startup.
+  adsService.init();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppDataController(FileStorageService()),
+    MultiProvider(
+      providers: [
+        Provider<FileStorageService>.value(value: storage),
+        Provider<AdsService>.value(value: adsService),
+        ChangeNotifierProvider(
+          create: (_) => AppDataController(storage),
+        ),
+      ],
       child: const PdfMasterApp(),
     ),
   );
