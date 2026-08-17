@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'core/storage/hive_boxes.dart';
 import 'core/storage/app_data_controller.dart';
 import 'core/services/file_storage_service.dart';
+import 'core/services/pdf_tools_service.dart';
 import 'core/services/ads_service.dart';
 import 'core/theme/app_theme.dart';
 import 'app_shell.dart';
@@ -29,6 +30,9 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider<FileStorageService>.value(value: storage),
+        Provider<PdfToolsService>.value(
+          value: PdfToolsService(storage),
+        ),
         Provider<AdsService>.value(value: adsService),
         ChangeNotifierProvider(
           create: (_) => AppDataController(storage),
