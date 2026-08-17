@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'app_shell.dart';
 
 void main() {
-  runApp(
-    const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text(
-            'BOOT OK',
-            style: TextStyle(fontSize: 30),
-          ),
-        ),
-      ),
-    ),
-  );
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const PdfMasterApp());
+}
+
+class PdfMasterApp extends StatelessWidget {
+  const PdfMasterApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'PDF Master Tools',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: const AppShell(),
+    );
+  }
 }
