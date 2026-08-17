@@ -15,16 +15,16 @@ import 'app_shell.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  unawaited(
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]),
+  );
 
-  }
-
-  // IMPORTANT:
-  // Do not initialize Hive or other storage before runApp().
-  // Native Android splash must be released as soon as Flutter can draw.
+  // Start Flutter immediately. Startup services are initialized
+  // after the first Flutter frame so the native Android splash
+  // is released as soon as possible.
   runApp(const PdfMasterApp());
 }
 
@@ -56,21 +56,23 @@ class _StartupGateState extends State<StartupGate> {
   @override
   void initState() {
     super.initState();
-    _startup = _initializeApp();
+    _startup = _initialize();
   }
 
-  Future<_StartupData> _initializeApp() async {
+  Future<_StartupData> _initialize() async {
     await HiveBoxes.init();
 
     final storage = FileStorageService();
     final dataController = AppDataController(storage);
-
     final adsService = AdsService();
+
+    // Ads must never block startup.
     unawaited(adsService.init());
 
     return _StartupData(
       storage: storage,
       dataController: dataController,
+      pdfToolsService: PdfToolsService(storage),
       adsService: adsService,
     );
   }
@@ -86,10 +88,10 @@ class _StartupGateState extends State<StartupGate> {
 
         if (snapshot.hasError) {
           return _StartupErrorScreen(
-            error: snapshot.error,
+            error: snapshot.error.toString(),
             onRetry: () {
               setState(() {
-                _startup = _initializeApp();
+                _startup = _initialize();
               });
             },
           );
@@ -103,7 +105,7 @@ class _StartupGateState extends State<StartupGate> {
               value: data.storage,
             ),
             Provider<PdfToolsService>.value(
-              value: PdfToolsService(data.storage),
+              value: data.pdfToolsService,
             ),
             Provider<AdsService>.value(
               value: data.adsService,
@@ -112,33 +114,9 @@ class _StartupGateState extends State<StartupGate> {
               value: data.dataController,
             ),
           ],
-          child: const _MainApp(),
+          child: const AppShell(),
         );
       },
-    );
-  }
-}
-
-class _MainApp extends StatelessWidget {
-  const _MainApp();
-
-  @override
-  Widget build(BuildContext context) {
-    final data = context.watch<AppDataController>();
-
-    final themeMode = switch (data.themeModeIndex) {
-      1 => ThemeMode.light,
-      2 => ThemeMode.dark,
-      _ => ThemeMode.system,
-    };
-
-    return MaterialApp(
-      title: 'PDF Master Tools',
-      debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      home: const AppShell(),
     );
   }
 }
@@ -146,11 +124,13 @@ class _MainApp extends StatelessWidget {
 class _StartupData {
   final FileStorageService storage;
   final AppDataController dataController;
+  final PdfToolsService pdfToolsService;
   final AdsService adsService;
 
   const _StartupData({
     required this.storage,
     required this.dataController,
+    required this.pdfToolsService,
     required this.adsService,
   });
 }
@@ -165,17 +145,14 @@ class _StartupLoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.picture_as_pdf_rounded,
               size: 64,
             ),
-            const SizedBox(height: 20),
-            Text(
-              'PDF Master Tools',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 20),
-            const CircularProgressIndicator(),
+            SizedBox(height: 20),
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('PDF Master Tools'),
           ],
         ),
       ),
@@ -184,7 +161,7 @@ class _StartupLoadingScreen extends StatelessWidget {
 }
 
 class _StartupErrorScreen extends StatelessWidget {
-  final Object? error;
+  final String error;
   final VoidCallback onRetry;
 
   const _StartupErrorScreen({
@@ -207,15 +184,15 @@ class _StartupErrorScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Unable to start the app',
+                'Startup failed',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
-                '$error',
+                error,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
