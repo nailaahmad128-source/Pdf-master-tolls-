@@ -264,12 +264,6 @@ class AppDataController extends ChangeNotifier {
     await _prefsBox.put('onboarding_complete', true);
   }
 
-  int get themeModeIndex => _prefsBox.get('theme_mode', defaultValue: 0) as int; // 0=system,1=light,2=dark
-  Future<void> setThemeModeIndex(int i) async {
-    await _prefsBox.put('theme_mode', i);
-    notifyListeners();
-  }
-
   // ---------------- Reader: last-page memory ----------------
 
   int? readerLastPage(String documentId) {

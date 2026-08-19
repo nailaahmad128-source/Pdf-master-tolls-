@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' show Offset, Rect;
@@ -263,32 +264,88 @@ class PdfToolsService {
     return file;
   }
 
-  /// Build a single PDF from a sequence of image files, one image per page,
+
+Future<List<dynamic>?> _prepareImageForPdf(String path) async {
+  try {
+    final bytes = await File(path).readAsBytes();
+    final decoded = img.decodeImage(bytes);
+    if (decoded == null) return null;
+
+    const maxWidth = 1800;
+
+    final resized = decoded.width > maxWidth
+        ? img.copyResize(
+            decoded,
+            width: maxWidth,
+            interpolation: img.Interpolation.average,
+          )
+        : decoded;
+
+    final jpg = img.encodeJpg(
+      resized,
+      quality: 88,
+    );
+
+    return <dynamic>[
+      Uint8List.fromList(jpg),
+      resized.width,
+      resized.height,
+    ];
+  } catch (_) {
+    return null;
+  }
+}
+
+
+/// Build a single PDF from a sequence of image files, one image per page,
   /// each page sized to match its image's aspect ratio.
-  Future<File> imagesToPdf(List<String> imagePaths, {required String outputName}) async {
+  Future<File> imagesToPdf(
+    List<String> imagePaths, {
+    required String outputName,
+  }) async {
     final pdfDoc = pw.Document();
+
     for (final path in imagePaths) {
-      final bytes = await File(path).readAsBytes();
-      final decoded = img.decodeImage(bytes);
-      if (decoded == null) continue;
-      final image = pw.MemoryImage(bytes);
-      final ratio = decoded.width / decoded.height;
-      const maxW = PdfPageFormat.a4;
-      final w = maxW.availableWidth;
-      final h = w / ratio;
+      final result = await compute(_prepareImageForPdf, path);
+      if (result == null) continue;
+
+      final jpg = result[0] as Uint8List;
+      final width = result[1] as int;
+      final height = result[2] as int;
+
+      final image = pw.MemoryImage(jpg);
+
+      const pageFormat = PdfPageFormat.a4;
+      final pageWidth = pageFormat.availableWidth;
+      final pageHeight = pageFormat.availableHeight;
+
+      final ratio = width / height;
+
+      var imageWidth = pageWidth;
+      var imageHeight = imageWidth / ratio;
+
+      if (imageHeight > pageHeight) {
+        imageHeight = pageHeight;
+        imageWidth = imageHeight * ratio;
+      }
+
       pdfDoc.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat.a4,
+          pageFormat: pageFormat,
           build: (context) => pw.Center(
             child: pw.SizedBox(
-              width: w,
-              height: h > maxW.availableHeight ? maxW.availableHeight : h,
-              child: pw.Image(image, fit: pw.BoxFit.contain),
+              width: imageWidth,
+              height: imageHeight,
+              child: pw.Image(
+                image,
+                fit: pw.BoxFit.contain,
+              ),
             ),
           ),
         ),
       );
     }
+
     final outBytes = await pdfDoc.save();
     final file = await storage.newTmpFile(outputName);
     await file.writeAsBytes(outBytes, flush: true);

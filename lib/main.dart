@@ -48,20 +48,12 @@ class PdfMasterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = context.watch<AppDataController>();
-
-    final themeMode = switch (data.themeModeIndex) {
-      1 => ThemeMode.light,
-      2 => ThemeMode.dark,
-      _ => ThemeMode.system,
-    };
-
     return MaterialApp(
       title: 'PDF Master Tools',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: themeMode,
+      themeMode: ThemeMode.system,
       home: const AppShell(),
     );
   }

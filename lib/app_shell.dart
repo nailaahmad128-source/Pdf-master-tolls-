@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/library/screens/library_screen.dart';
 import 'features/trash/screens/trash_screen.dart';
-import 'features/settings/screens/settings_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -18,7 +17,6 @@ class _AppShellState extends State<AppShell> {
     HomeScreen(),
     LibraryScreen(),
     TrashScreen(),
-    SettingsScreen(),
   ];
 
   @override
@@ -43,11 +41,6 @@ class _AppShellState extends State<AppShell> {
             icon: Icon(Icons.delete_outline_rounded),
             selectedIcon: Icon(Icons.delete_rounded),
             label: 'Deleted',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
-            label: 'Settings',
           ),
         ],
       ),
