@@ -29,6 +29,7 @@ class DocumentItem {
   });
 
   DocumentItem copyWith({
+    String? id,
     String? name,
     String? filePath,
     String? thumbnailPath,
@@ -38,7 +39,7 @@ class DocumentItem {
     bool? isFavorite,
   }) {
     return DocumentItem(
-      id: id,
+      id: id ?? this.id,
       name: name ?? this.name,
       filePath: filePath ?? this.filePath,
       thumbnailPath: thumbnailPath ?? this.thumbnailPath,
