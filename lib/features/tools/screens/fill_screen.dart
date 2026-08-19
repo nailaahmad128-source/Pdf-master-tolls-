@@ -66,11 +66,9 @@ class _FillScreenState extends State<FillScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'Form filled!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'Form filled!'),
       ));
       setState(() { _path = null; _fields = []; _textValues.clear(); _checkValues.clear(); });
     } catch (e) {

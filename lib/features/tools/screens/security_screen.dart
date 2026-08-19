@@ -85,10 +85,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
         pageCount: pages,
       );
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
         builder: (_) => ToolResultScreen(
-          results: [updated],
+          results: [doc],
           successTitle: _mode == _SecMode.protect ? 'PDF protected!' : 'PDF unlocked!',
         ),
       ));

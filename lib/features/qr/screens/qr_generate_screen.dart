@@ -149,10 +149,9 @@ class _QrGenerateScreenState extends State<QrGenerateScreen> {
       toolTitle: 'Generated QR code',
       type: 'image',
     );
-    await data.updateDocument(doc.copyWith(thumbnailPath: doc.filePath));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('QR code saved to your Library')),
+      const SnackBar(content: Text('QR code saved to QR History')),
     );
   }
 

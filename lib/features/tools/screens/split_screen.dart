@@ -91,7 +91,6 @@ class _SplitScreenState extends State<SplitScreen> {
           type: 'pdf',
           pageCount: pages,
         );
-        if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
         results.add(data.documentById(doc.id) ?? doc);
       }
       if (!mounted) return;

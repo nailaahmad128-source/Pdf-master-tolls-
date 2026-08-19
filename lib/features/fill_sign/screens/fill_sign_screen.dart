@@ -189,11 +189,9 @@ class _FillSignScreenState extends State<FillSignScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'Document signed!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'Document signed!'),
       ));
     } catch (e) {
       if (mounted) {

@@ -51,11 +51,9 @@ class _ImageToPdfScreenState extends State<ImageToPdfScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'PDF created!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'PDF created!'),
       ));
       setState(() => _images.clear());
     } catch (e) {

@@ -7,15 +7,17 @@ import '../../../core/storage/app_data_controller.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../core/widgets/empty_state.dart';
 
-/// Recent activity for one tool.
-/// Tool results live in the tool-results folder, not in Library.
+/// A collapsible "Recent" section shown at the bottom of every tool
+/// screen. Removing an entry here only deletes the history record — the
+/// underlying saved file in the Library is left untouched, per spec.
+///
+/// Some tools (QR Scanner) produce history entries with no associated
+/// file — just a scanned value stored in [ToolHistoryEntry.note]. Those
+/// entries render with the value itself as the subtitle, and tapping one
+/// copies it to the clipboard instead of trying to open a file.
 class ToolHistorySection extends StatelessWidget {
   final ToolId toolId;
-
-  const ToolHistorySection({
-    super.key,
-    required this.toolId,
-  });
+  const ToolHistorySection({super.key, required this.toolId});
 
   @override
   Widget build(BuildContext context) {
@@ -48,34 +50,20 @@ class ToolHistorySection extends StatelessWidget {
           ],
         ),
         ...entries.map((e) {
-          final resultPath = e.resultFilePath;
-          final resultName = e.resultFileName ?? e.title;
-          final resultSize = e.resultSizeBytes;
-          final hasFileResult =
-              resultPath != null && resultPath.isNotEmpty;
-          final hasNoteOnly =
-              !hasFileResult && e.note != null && e.note!.isNotEmpty;
-
+          final doc = e.resultDocumentId != null ? data.documentById(e.resultDocumentId!) : null;
+          final hasNoteOnly = doc == null && e.note != null && e.note!.isNotEmpty;
           return Card(
             child: ListTile(
               leading: Icon(
-                e.success
-                    ? Icons.check_circle_rounded
-                    : Icons.error_rounded,
-                color: e.success
-                    ? Colors.green
-                    : theme.colorScheme.error,
+                e.success ? Icons.check_circle_rounded : Icons.error_rounded,
+                color: e.success ? Colors.green : theme.colorScheme.error,
               ),
-              title: Text(
-                resultName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              title: Text(e.title, maxLines: 1, overflow: TextOverflow.ellipsis),
               subtitle: Text(
                 hasNoteOnly
                     ? '${e.note} · ${formatRelativeDate(e.createdAt)}'
-                    : hasFileResult
-                        ? '${resultSize != null ? formatBytes(resultSize) : ''} · ${formatRelativeDate(e.createdAt)}'
+                    : doc != null
+                        ? '${formatBytes(doc.sizeBytes)} · ${formatRelativeDate(e.createdAt)}'
                         : formatRelativeDate(e.createdAt),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -85,19 +73,14 @@ class ToolHistorySection extends StatelessWidget {
                 onPressed: () => data.removeHistoryEntry(e.id),
                 tooltip: 'Remove from history',
               ),
-              onTap: hasFileResult
-                  ? () => OpenFilex.open(resultPath)
+              onTap: doc != null
+                  ? () => OpenFilex.open(doc.filePath)
                   : hasNoteOnly
                       ? () async {
-                          await Clipboard.setData(
-                            ClipboardData(text: e.note!),
-                          );
+                          await Clipboard.setData(ClipboardData(text: e.note!));
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Copied to clipboard'),
-                              ),
-                            );
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
                           }
                         }
                       : null,
@@ -109,17 +92,14 @@ class ToolHistorySection extends StatelessWidget {
   }
 }
 
-/// Full-screen history page for tools whose main screen is a
-/// camera/canvas/full-bleed interface.
+/// Full-screen wrapper around [ToolHistorySection], used by tools whose
+/// primary screen is a full-bleed canvas/camera view (Fill & Sign, QR
+/// Scanner, QR Generator) where the history list can't just live inline
+/// at the bottom of the screen.
 class ToolHistoryScreen extends StatelessWidget {
   final ToolId toolId;
   final String title;
-
-  const ToolHistoryScreen({
-    super.key,
-    required this.toolId,
-    required this.title,
-  });
+  const ToolHistoryScreen({super.key, required this.toolId, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +108,7 @@ class ToolHistoryScreen extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
-          children: [
-            ToolHistorySection(toolId: toolId),
-          ],
+          children: [ToolHistorySection(toolId: toolId)],
         ),
       ),
     );

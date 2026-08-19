@@ -59,15 +59,13 @@ class _CompressScreenState extends State<CompressScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       final saved = _originalSize > 0
-          ? (100 - (updated.sizeBytes / _originalSize * 100)).clamp(0, 99).toStringAsFixed(0)
+          ? (100 - (doc.sizeBytes / _originalSize * 100)).clamp(0, 99).toStringAsFixed(0)
           : null;
       Navigator.push(context, MaterialPageRoute(
         builder: (_) => ToolResultScreen(
-          results: [updated],
+          results: [doc],
           successTitle: saved != null ? 'Reduced by $saved%!' : 'Compressed!',
         ),
       ));

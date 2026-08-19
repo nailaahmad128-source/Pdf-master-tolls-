@@ -65,11 +65,9 @@ class _ReorderScreenState extends State<ReorderScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'Pages reordered!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'Pages reordered!'),
       ));
       setState(() { _path = null; _thumbs = []; _order = []; });
     } catch (e) {

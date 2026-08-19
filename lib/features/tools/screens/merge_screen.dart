@@ -44,11 +44,9 @@ class _MergeScreenState extends State<MergeScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'PDFs merged!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'PDFs merged!'),
       ));
       setState(() => _paths.clear());
     } catch (e) {

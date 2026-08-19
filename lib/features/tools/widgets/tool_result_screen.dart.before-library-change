@@ -67,8 +67,8 @@ class _ToolResultScreenState extends State<ToolResultScreen> {
               const SizedBox(height: 6),
               Text(
                 widget.results.length == 1
-                    ? 'Ready to open or share'
-                    : '${widget.results.length} files ready to open or share',
+                    ? 'Saved to your Library'
+                    : '${widget.results.length} files saved to your Library',
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 24),

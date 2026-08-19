@@ -36,6 +36,7 @@ class FileStorageService {
   }
 
   Future<Directory> get libraryDir => _sub('library');
+  Future<Directory> get toolResultsDir => _sub('tool_results');
   Future<Directory> get trashDir => _sub('trash');
   Future<Directory> get thumbnailsDir => _sub('thumbnails');
   Future<Directory> get tmpDir => _sub('tmp');
@@ -59,10 +60,10 @@ class FileStorageService {
     return dest.path;
   }
 
-  /// Moves a freshly-produced tool output (already in tmp/) into the
-  /// Library folder.
+  /// Moves a freshly-produced tool output into the private Tool Results
+  /// folder. Tool results are NOT part of the user Library.
   Future<String> commitToolOutput(File tmpFile, {required String fileName}) async {
-    final dir = await libraryDir;
+    final dir = await toolResultsDir;
     final safe = fileName.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
     final unique = '${p.basenameWithoutExtension(safe)}_${_uuid.v4().substring(0, 8)}${p.extension(safe)}';
     final dest = File(p.join(dir.path, unique));

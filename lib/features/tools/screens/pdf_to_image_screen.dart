@@ -55,7 +55,6 @@ class _PdfToImageScreenState extends State<PdfToImageScreen> {
           toolTitle: 'Images from $baseName',
           type: 'image',
         );
-        await data.updateDocument(doc.copyWith(thumbnailPath: doc.filePath));
         results.add(data.documentById(doc.id) ?? doc);
       }
       if (!mounted) return;

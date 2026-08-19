@@ -206,8 +206,8 @@ class AppDataController extends ChangeNotifier {
     await _prefsBox.put('reader_last_page_$documentId', page);
   }
 
-  /// Registers a brand-new file produced by a tool in the
-  /// private Tool Results storage and creates its tool history entry.
+  /// Convenience: register a brand-new file produced by a tool as both a
+  /// Library document AND a history entry in one call.
   Future<DocumentItem> registerToolResult({
     required File tmpFile,
     required String fileName,
@@ -216,12 +216,8 @@ class AppDataController extends ChangeNotifier {
     required String type,
     int? pageCount,
   }) async {
-    // Tool results are deliberately kept OUTSIDE the Library.
-    // They live in the app's tool-output storage and are referenced
-    // directly by ToolHistoryEntry.
     final finalPath = await storage.commitToolOutput(tmpFile, fileName: fileName);
     final size = await storage.fileSize(finalPath);
-
     final doc = DocumentItem(
       id: storage.newId(),
       name: fileName,
@@ -233,19 +229,15 @@ class AppDataController extends ChangeNotifier {
       sourceToolId: toolId,
       pageCount: pageCount,
     );
-
+    await addDocument(doc);
     await addHistoryEntry(ToolHistoryEntry(
       id: storage.newId(),
       toolId: toolId,
       title: toolTitle,
-      resultDocumentId: null,
-      resultFilePath: finalPath,
-      resultFileName: fileName,
-      resultSizeBytes: size,
+      resultDocumentId: doc.id,
       createdAt: DateTime.now(),
       success: true,
     ));
-
     return doc;
   }
 }

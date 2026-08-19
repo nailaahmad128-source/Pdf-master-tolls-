@@ -101,11 +101,9 @@ class _RotateScreenState extends State<RotateScreen> {
         type: 'pdf',
         pageCount: pages,
       );
-      if (thumb != null) await data.updateDocument(doc.copyWith(thumbnailPath: thumb));
       if (!mounted) return;
-      final updated = data.documentById(doc.id) ?? doc;
       Navigator.push(context, MaterialPageRoute(
-        builder: (_) => ToolResultScreen(results: [updated], successTitle: 'Pages rotated!'),
+        builder: (_) => ToolResultScreen(results: [doc], successTitle: 'Pages rotated!'),
       ));
       setState(() { _path = null; _thumbs = []; _rotations.clear(); _selected.clear(); });
     } catch (e) {

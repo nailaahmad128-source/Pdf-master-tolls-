@@ -116,7 +116,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       icon: Icons.folder_open_rounded,
                       title: data.documents.isEmpty ? 'Your Library is empty' : 'No matches',
                       message: data.documents.isEmpty
-                          ? 'Files you create with tools are saved here automatically. You can also import your own PDFs.'
+                          ? 'Import your own PDF files here to read them in the PDF Reader.'
                           : 'Try a different search or filter.',
                       action: data.documents.isEmpty
                           ? FilledButton.icon(
