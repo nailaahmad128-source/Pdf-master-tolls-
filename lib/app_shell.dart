@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/library/screens/library_screen.dart';
-import 'features/tools/screens/tools_screen.dart';
 import 'features/trash/screens/trash_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
 
@@ -18,7 +17,6 @@ class _AppShellState extends State<AppShell> {
   final _screens = const [
     HomeScreen(),
     LibraryScreen(),
-    ToolsScreen(),
     TrashScreen(),
     SettingsScreen(),
   ];
@@ -40,11 +38,6 @@ class _AppShellState extends State<AppShell> {
             icon: Icon(Icons.folder_outlined),
             selectedIcon: Icon(Icons.folder_rounded),
             label: 'Library',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.build_outlined),
-            selectedIcon: Icon(Icons.build_rounded),
-            label: 'Tools',
           ),
           NavigationDestination(
             icon: Icon(Icons.delete_outline_rounded),

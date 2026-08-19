@@ -103,6 +103,20 @@ class FileStorageService {
     return dest.path;
   }
 
+  /// Renames a file inside the private tool-results folder.
+  Future<String> renameToolResult(String oldPath, String newName) async {
+    final dir = await toolResultsDir;
+    final safe = newName.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_').trim();
+    final cleaned = safe.isEmpty ? 'result' : safe;
+    final dest = File(p.join(dir.path, cleaned));
+    final src = File(oldPath);
+
+    if (await src.exists()) {
+      return (await src.rename(dest.path)).path;
+    }
+    return oldPath;
+  }
+
   Future<void> deletePermanently(String path) async {
     final f = File(path);
     if (await f.exists()) {

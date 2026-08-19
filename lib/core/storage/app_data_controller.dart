@@ -170,6 +170,80 @@ class AppDataController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Saves a tool result into the real Library.
+  Future<DocumentItem?> saveToolResultToLibrary(DocumentItem doc) async {
+    final source = File(doc.filePath);
+    if (!await source.exists()) return null;
+
+    final copiedPath = await storage.importIntoLibrary(
+      source,
+      preferredName: doc.name,
+    );
+    final size = await storage.fileSize(copiedPath);
+
+    final libraryDoc = doc.copyWith(
+      id: storage.newId(),
+      filePath: copiedPath,
+      sizeBytes: size,
+      modifiedAt: DateTime.now(),
+    );
+
+    await addDocument(libraryDoc);
+    return libraryDoc;
+  }
+
+  /// Renames a tool result and updates its history record.
+  Future<DocumentItem> renameToolResult(
+    DocumentItem doc,
+    String newName,
+  ) async {
+    final newPath = await storage.renameToolResult(
+      doc.filePath,
+      newName,
+    );
+
+    final keys = _historyBox.keys.toList();
+    for (final key in keys) {
+      final raw = _historyBox.get(key);
+      if (raw == null) continue;
+
+      final map = Map<String, dynamic>.from(raw as Map);
+
+      if (map['resultFilePath'] == doc.filePath) {
+        map['resultFilePath'] = newPath;
+        map['resultFileName'] = newName;
+        await _historyBox.put(key, map);
+      }
+    }
+
+    notifyListeners();
+
+    return doc.copyWith(
+      name: newName,
+      filePath: newPath,
+    );
+  }
+
+  /// Deletes a tool result and its history record.
+  Future<void> deleteToolResult(DocumentItem doc) async {
+    final keys = _historyBox.keys.toList();
+
+    for (final key in keys) {
+      final raw = _historyBox.get(key);
+      if (raw == null) continue;
+
+      final map = Map<String, dynamic>.from(raw as Map);
+
+      if (map['resultFilePath'] == doc.filePath) {
+        await _historyBox.delete(key);
+      }
+    }
+
+    await storage.deletePermanently(doc.filePath);
+    notifyListeners();
+  }
+
+
   Future<void> clearHistoryForTool(String toolId) async {
     final keys = _historyBox.keys.where((k) {
       final raw = _historyBox.get(k);

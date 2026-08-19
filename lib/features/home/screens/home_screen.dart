@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/tools_catalog.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/banner_ad_slot.dart';
-import '../../tools/screens/tools_screen.dart';
 import '../../tools/screens/tool_router.dart';
 import '../../qr/screens/qr_scan_screen.dart';
 import '../../qr/screens/qr_generate_screen.dart';
@@ -69,16 +68,9 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 28),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Popular tools', style: Theme.of(context).textTheme.titleLarge),
-                        TextButton(
-                          onPressed: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => const ToolsScreen())),
-                          child: const Text('See all'),
-                        ),
-                      ],
+                    Text(
+                      'All Tools',
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     GridView.count(
@@ -88,8 +80,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                       childAspectRatio: 1.5,
-                      children: ToolsCatalog.popularOnHome.map((id) {
-                        final tool = ToolsCatalog.byId(id);
+                      children: ToolsCatalog.all.map((tool) {
                         return PopularToolCard(
                           tool: tool,
                           onTap: () => openTool(context, tool.id),
